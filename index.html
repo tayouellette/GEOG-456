@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<style> 
+body {background-color: rgb(216, 185, 147);}
+
+#daRedBox {
+    position: absolute;
+    top: 25%;
+    width: 100%;
+    height: 50%;
+    background-color: red;
+}
+
+.daBlueBox {
+    position: absolute;
+    top: 25%;
+    left: 25%;
+    width: 50%;
+    height: 50%;
+    background-color: blue;
+}
+
+h1 {
+    position: relative;
+    text-align: center;
+    top: 25%;
+}
+
+</style>
+
+<body>
+    <div id="daRedBox"> 
+        <div class="daBlueBox">
+            <div onclick="console.log('the div was clicked')">Click to log in console </div>
+            <h1 onclick="alert('hello there')" >Click Here!</h1>
+    </div>
+    
+</body>
+
+</html>
