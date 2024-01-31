@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js" integrity="sha512-SGWgwwRA8xZgEoKiex3UubkSkV1zSE1BS6O4pXcaxcNtUlQsOmOmhVnDwIvqGRfEmuz83tIGL13cXMZn6upPyg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><body>
+        
+</body>
+<script>
+let myResult;
+const fileURL = 'https://raw.githubusercontent.com/tayouellette/GEOG-456/main/share-global-ghg-emissions.csv'
+const myObj = { 
+    download: true,
+    header: true,
+    complete: function(result) {
+        //console.log(result.data)
+        myResult=result.data
+    }
+}
+Papa.parse(fileURL,myObj)
+
+</script>
+</html>
