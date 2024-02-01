@@ -37,9 +37,6 @@ crossorigin=""></script>
 	    maxZoom: 13
         });
         L.geoJSON(TeresaStorm).addTo(map)
-        
-        var marker = L.marker(landing).bindPopup("<b>Teresa Hurricane</b>").addTo(map);
-        // L.geoJSON(waypoints).addTo(map);
 
         var geojsonMarkerOptions = {
         radius: 8,
@@ -59,15 +56,18 @@ crossorigin=""></script>
         var lat = Teresa.features[0].geometry.coordinates[1];
         var cord = [lat, lon];
         L.marker(cord).addTo(map);
+        
+        var marker = L.marker(landing).bindPopup("<b>Teresa Hurricane</b>").addTo(map);
+        // L.geoJSON(waypoints).addTo(map);
 
         var baseMaps = {
             "Open Street Map": OSM,
-             "Esri Images": Esri_WorldImagery
+             "Esri Images": Esri_OceanBasemap
         };
 
         var overlayMaps = {
             "Tersa Hurricane": TeresaStorm,
-            "Tersa Landing": landing
+            "Tersa Landing": marker
         };
         var layerControl = L.control.layers (baseMaps, overlayMaps).addTo(map);
 
