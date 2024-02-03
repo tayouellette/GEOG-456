@@ -14,19 +14,25 @@ integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
 crossorigin=""></script>
 
 <style>
-    #map { height: 500px;  }
+    #map { height: 600px;max-width: 100%;  }
+    #satellite_image {height: 400px; width: 300px;}
 </style>
 
 <body>
     <h1><a href="https://hypotheticalhurricanes.fandom.com/wiki/Hurricane_Teresa_(2021)(Barry_Baardmans)#:~:text=Teresa%20intensified%20from%20a%20tropical,in%20the%20North%20Atlantic%20Ocean.">Hurricane Teresa</a></h1>
+    
     <div id="map"></div>
+
+    <div id="satellite_image">
+        <img src="https://static01.nyt.com/images/2021/09/24/us/24xp-teresa1/24xp-teresa1-superJumbo.jpg?quality=75&auto=webp"><h2>Satellite Image of Hurricane Teresa</h2>
+    </div> 
 
     <script src="Teresa.js"></script>
 
     <script>
         
-        var landing = [31, -66]
-        var map = L.map('map').setView(landing,2);
+        var landing = [33.5, -64]
+        var map = L.map('map').setView(landing,6.8);
         var OSM = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
                         maxZoom: 19,
                         attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
@@ -36,7 +42,6 @@ crossorigin=""></script>
 	    attribution: 'Tiles &copy; Esri &mdash; Sources: GEBCO, NOAA, CHS, OSU, UNH, CSUMB, National Geographic, DeLorme, NAVTEQ, and Esri',
 	    maxZoom: 13
         });
-        L.geoJSON(TeresaStorm).addTo(map)
 
         var geojsonMarkerOptions = {
         radius: 8,
@@ -57,8 +62,10 @@ crossorigin=""></script>
         var cord = [lat, lon];
         L.marker(cord).addTo(map);
         
-        var marker = L.marker(landing).bindPopup("<b>Teresa Hurricane</b>").addTo(map);
+        var marker = L.marker(landing).bindPopup("<b>Hurricane Teresa</b>").addTo(map);
         // L.geoJSON(waypoints).addTo(map);
+
+        TeresaStorm.addTo(map)
 
         var baseMaps = {
             "Open Street Map": OSM,
