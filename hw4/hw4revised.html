@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kruger National Park Illegal Hunting Data Visualization</title>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""/>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""></script>
+
+    <script src="knp_ihd.js"></script>
+
+</head>
+<body>
+    <div id="map" style="width: 100%; height: 900px;"></div>
+    <script src="knp_ihd.js"></script>
+    <script>
+        var map = L.map('map').setView([-23.988, 31.554], 6.9); // Adjust the center coordinates and zoom level as needed
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    L.geoJSON(data, {
+     onEachFeature: function (feature, layer) {
+        // This is where you can customize the popup info; modify as needed
+        layer.bindPopup('<h3>' + feature.properties.Label + '</h3>' +
+            '<p>2014: ' + feature.properties.KNP_IHD_2014 + '</p>' +
+            '<p>2015: ' + feature.properties.KNP_IHD_2015 + '</p>' +
+            // Continue for other years
+            '<p>2022: ' + feature.properties.KNP_IHD_2022 + '</p>');
+    }
+    }).addTo(map);
+
+    var geojsonMarkerOptions = {
+    radius: 8,
+    fillColor: "#ff7800",
+    color: "#000",
+    weight: 1,
+    opacity: 1,
+    fillOpacity: 0.8
+    };
+
+    var marker = L.marker([-23.988, 31.554]).addTo(map);
+    marker.bindPopup("<b>Kruger National Park (KNP)</b>").openPopup();
+
+    </script>
+</body>
+</html>
