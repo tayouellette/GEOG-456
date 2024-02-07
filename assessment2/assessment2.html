@@ -57,6 +57,7 @@ crossorigin=""></script>
                 return L.circleMarker(latlng, geojsonMarkerOptions);
             }
         }).addTo(map);
+        
         var lon = Teresa.features[0].geometry.coordinates[0]; 
         var lat = Teresa.features[0].geometry.coordinates[1];
         var cord = [lat, lon];
