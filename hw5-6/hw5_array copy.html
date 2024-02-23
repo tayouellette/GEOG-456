@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kruger National Park Ranger Sections & Poaching Percents</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <script src="knp-shp-3.js"></script>
+
+    <script src="var_sections.js"></script>
+
+    <style>
+    #container {
+        width: 400px;
+        height: 100px;
+        border: 1px solid black;
+        display: flex;
+        align-items: flex-end;
+    }
+    /* this has the css for the columns */
+    .column {
+        width: 10%;
+        display: flex;
+        align-items: center; 
+        justify-content: center; 
+        background-color: gray;
+        border: 1px solid black;
+    }
+    </style>
+
+</head>
+
+<body>
+    <div id="map" style="width: 100%; height: 900px;"></div>
+
+    <div id="container"></div>
+
+    <script>
+
+        var map = L.map('map').setView([-23.988, 31.554], 7.5); // Adjust the center coordinates and zoom level as needed
+
+        var sectionNames = sections.features.map(function (feature) {
+            return feature.properties.Name;
+        });
+
+        var sectionCoords = sections.features.map(function (feature) {
+            return [feature.properties.name_sections_Lat, feature.properties.name_sections_Long];
+        });
+
+        var sectionPoaching = sections.features.map(function (feature) {
+            return feature.properties.name_sections_Poaching
+        });
+
+        console.log(sectionNames, sectionCoords, sectionPoaching);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        sections.features.forEach(feature => {
+            var lat = feature.properties.name_sections_Lat;
+            var lng = feature.properties.name_sections_Long;
+            var name = feature.properties.Name;
+            var marker = L.marker([lat, lng]).addTo(map);
+            marker.bindPopup("<h3>Section: " + name + "</h3>");
+        }
+        );
+
+        var geojsonMarkerOptions = {
+            radius: 8,
+            fillColor: "#ff7800",
+            color: "#000",
+            weight: 1,
+            opacity: 1,
+            fillOpacity: 0.8
+        };
+
+        var container = document.getElementById("container");
+
+        function addColumn() {
+            var columnDiv = document.createElement("div"); // create a div element
+            columnDiv.className = "column"; // assign a class to the div element
+            columnDiv.style.height = '100px'; // '100%' // assign a height to the element
+            container.append(columnDiv); // append the div to the container
+        }
+
+        sectionPoaching.forEach(e => addColumn()
+        )
+
+    </script>
+</body>
+
+</html>
