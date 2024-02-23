@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   
+    <title>Poaching Distribution per Ranger Section in Kruger National Park</title>
+    
+    <style>
+        #container {
+            width: 1500px;
+            height: 600px;
+            border: 1px solid black;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            overflow:auto;
+        }
+        .column {
+            width: 30%;
+            display: flex;
+            flex-direction: column;
+            align-items: center; 
+            background-color: gray;
+            margin: 2px;
+            border: 1px solid black;
+            font-size: small;
+        }
+    </style>
+</head>
+<body>
+    <div id="container"></div>
+    <h1>Poaching Distribution per Ranger Section in Kruger National Park</h1>
+    <h3>Map of Ranger Sections: <a href>https://tayouellette.github.io/GEOG-456/hw5/hw5_array.html</a></h3>
+   
+    <script src="var_sections.js"></script>
+
+
+    <script>
+        var containerHeight = 400;
+
+        var container = document.getElementById("container");
+
+        var sectionPoaching = sections.features.map(function (feature) {
+            return feature.properties.name_sections_Poaching
+        });
+        
+        var maxPoachingValue = Math.max(...sections.features.map(feature => feature.properties.name_sections_Poaching));
+
+        function addColumn(feature){
+              var columnDiv = document.createElement("div"); // create a div element
+              columnDiv.className = "column"; // assign a class to the div element
+              
+              var normalizedHeight = (feature.properties.name_sections_Poaching / maxPoachingValue) * (containerHeight); 
+                 columnDiv.style.height = `${normalizedHeight}px`;
+                 columnDiv.textContent = `${feature.properties.Name}: ${feature.properties.name_sections_Poaching}`;
+              
+              var poachingValue = feature.properties.name_sections_Poaching;
+                 columnDiv.style.backgroundColor = selectColorByValue(poachingValue);
+                 container.append(columnDiv); // append the div to the container
+             }
+       
+             function selectColorByValue(value){
+            if (value < 5) {return 'yellow'}
+            if (value < 10) {return 'orange'}
+            if (value >=10) {return 'red'}
+        }
+        
+        sections.features.forEach(addColumn);
+  </script>
+</body>
+</html>
