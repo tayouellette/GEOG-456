@@ -13,16 +13,12 @@
 </head>
 <body>
     <h1>Kruger National Park: Distribution of Rhino Poaching Across Ranger Sections</h1>
+    
     <div id="map"></div>
     <div class="slider-label"><span id="year-label">Annual Rhino Poaching Across Ranger Sections</span></div>
-    <!-- Slider for selecting the year -->
     <div style="text-align: center;">
     <input id="yearSlider" type="range" min="2013" max="2022" value="2013" oninput="updateMap(this.value)" />
     <p>Year: <span id="yearDisplay">2013</span></p>
-    </div>
-    <!-- Container for the poaching link -->
-    <div id="poachingLink" style="position: fixed; bottom: 20px; left: 20px; background: rgba(255, 255, 255, 0.8); padding: 10px; border-radius: 5px;">
-    <a href="https://www.poachingfacts.com/poaching-statistics/rhino-poaching-statistics/#"><h3>Rhino Poaching Statistics</h3></a>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
