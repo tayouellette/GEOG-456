@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>2012-2022 Change with Buttons</title>
+    <style>
+        img{
+            position: absolute;
+            width: 800px;
+            visibility: hidden;
+            z-index: 1;
+        }
+        button{
+            position: absolute;
+            top: 450px;
+            z-index: 2;
+        }
+        #image-info {
+            position: absolute;
+            top: 30px;
+            left: 15px;
+            width: 100%;
+            text-align: left;
+            font-size: 20px;
+            color: #ffffff;
+            z-index: 2;
+        }
+    </style>
+</head>
+<body>
+    <img id="third" src="./imgs/2022.png" alt="2022 Land Cover" style="visibility: hidden;">
+    <img id="second" src="./imgs/2020.png" alt="2020 Land Cover" style="visibility: hidden;">
+    <img id="first" src="./imgs/2012.png" alt="2012 Land Cover" style="visibility: visible;">
+
+    <div id="image-info">2012 Land Cover</div>
+
+
+    <button style="left:10px" onclick="myFunction('first', '2012 Land Cover')">2012</button>
+    <button style="left:60px" onclick="myFunction('second', '2020 Land Cover')">2020</button>
+    <button style="left:110px" onclick="myFunction('third', '2022 Land Cover')">2022</button>
+
+<script>
+    var first = document.getElementById('first')
+    var second = document.getElementById('second');
+    var third = document.getElementById('third');
+
+    function myFunction(id, label) {
+            var imgs = document.getElementsByTagName('img');
+            for (var i = 0; i < imgs.length; i++) {
+                imgs[i].style.visibility = 'hidden';
+            }
+            var daImg = document.getElementById(id);
+            daImg.style.visibility = 'visible';
+
+            var info = document.getElementById('image-info');
+            info.textContent = label;
+        }
+</script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Kruger National Park Poaching per Ranger Section</title>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.css" rel="stylesheet">
+    <style>
+        body { margin: 0; padding: 0; }
+        #map { width: 100%; height: 780px; }
+        .mapboxgl-popup-content {
+            font-size: 16px; /* Adjust font size as needed */
+        }
+    </style>
+</head>
+<body>
+    <h1>Kruger National Park: Distribution of Poaching Across Ranger Sections in 1946</h1>
+    <div id="map"></div>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.js"></script>
+    <script src="final project/1946_knpsections_poach.js"></script>
+    <script>
+        mapboxgl.accessToken = 'pk.eyJ1IjoidGF5bW8iLCJhIjoiY2x1cjJjaW51MDJobjJsbWwyZWZ2eGdydCJ9.Ptv62YeOAkgL0xmrt3VjdA'; // Ensure this is your actual Mapbox access token
+        
+        // Load the map style from a local JSON file
+        fetch('final project/style.json')
+        .then(response => response.json())
+        .then(styleJson => {
+            var map = new mapboxgl.Map({
+                container: 'map',
+                style: styleJson,
+                center: [31.521001, -24.696295], // Center on Kruger National Park
+                zoom: 7.5 // Initial zoom level
+            });
+
+            // Additional map setup, like adding markers or layers, goes here
+        })
+        .catch(error => console.error('Error loading the map style:', error));
+    </script>
+</body>
+</html>

@@ -259,7 +259,7 @@ var sections = {
     { "Year": 2020, "Incidents": 16 },
     { "Year": 2021, "Incidents": 10 },
     { "Year": 2022, "Incidents": 5 } ]}, "geometry": { "type": "MultiPolygon", "coordinates": [ ] } },
-{ "type": "Feature", "properties": { "Name": "Malelane", "Size_ha": null, "Shape__Are": null, "Shape__Len": null, "name_sections_Lat": -25.472, "name_sections_Long": 31.5088, 
+{ "type": "Feature", "properties": { "Name": "Malelane", "Size_ha": null, "Shape__Are": null, "Shape__Len": null, "name_sections_Lat": -25.392, "name_sections_Long": 31.5088, 
 "name_sections_Poaching": 1.8,
 "PoachingData": [
     { "Year": 2013, "Incidents": 11 },
@@ -272,7 +272,7 @@ var sections = {
     { "Year": 2020, "Incidents": 5 },
     { "Year": 2021, "Incidents": 4 },
     { "Year": 2022, "Incidents": 2 } ]}, "geometry": { "type": "MultiPolygon", "coordinates": [ ] } },
-{ "type": "Feature", "properties": { "Name": "Crocodile Bridge", "Size_ha": null, "Shape__Are": null, "Shape__Len": null, "name_sections_Lat": -25.3583, "name_sections_Long": 31.892, 
+{ "type": "Feature", "properties": { "Name": "Crocodile Bridge", "Size_ha": null, "Shape__Are": null, "Shape__Len": null, "name_sections_Lat": -25.2783, "name_sections_Long": 31.892, 
 "name_sections_Poaching": 5.93,
 "PoachingData": [
     { "Year": 2013, "Incidents": 36 },

@@ -2,11 +2,17 @@
     <meta charset="UTF-8">
     <title>Exploring the Spatial & Temporal Dimensions of Poaching in Kruger National Park</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Corrected Leaflet CSS link -->
+    <!-- Leaflet CSS link -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-    <!-- Include libraries like Leaflet for maps and Chart.js for charts -->
+    <!-- JS libraries for animation -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.5.1/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.7/ScrollMagic.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.7/plugins/animation.gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.7/plugins/debug.addIndicators.min.js"></script> <!-- Optional for debugging -->
+    <script src="animation.js"></script>
+
     <style>
         .logo {
             position: absolute; /* Or 'fixed' if you want it to stay in place on scroll */
@@ -16,12 +22,55 @@
             height: auto; /* Keeps the aspect ratio */
         }
 
-        /* Moved CSS here */
-        .image-container {
-            display: flex;
-            justify-content: space-between; /* Adjusts the space between the images */
+        .title-background {
+            background-image: url('img/An\ armed\ ranger\ accompanies\ every\ hike\ in\ Kruger.jpg'); /* Ensure correct path */
+            background-size: cover;
+            background-position: center;
+            color: white;
+            text-align: left;
+            padding: 0px 0;
+            min-height: 1024px; /* or consider using vh for better responsiveness */
+            width: 100vw; /* Ensure it spans the full viewport width */
+            position: sticky; /* or 'sticky' if you want it to stick at the top */
+            top: 0;
+            left: 0; /* Align to the left edge */
+            right: 0; /* Align to the right edge */
+            z-index: 1000; /* Ensure it's above other content if using sticky */
         }
-        
+
+        .images-container {
+            display: flex;
+            justify-content: space-around; /* This spaces out the items */
+            align-items: flex-start; /* Align items to the top */
+            flex-wrap: wrap; /* Allows items to wrap on smaller screens */
+            gap: 20px; /* Space between items */
+            padding: 20px 0; /* Extra padding around the container for better spacing */
+        }
+
+        .media-item {
+            flex-basis: calc(50% - 10px); /* Adjusts the base size of each item */
+            max-width: 50%; /* Controls maximum width to allow for larger display */
+            text-align: center; /* Centers the content */
+        }
+
+        .media-item img {
+            width: 100%; /* Allows the image to fill its container */
+            height: auto; /* Maintains the image's aspect ratio */
+        }
+
+        .media-item iframe {
+            width: 100%; /* Allows the iframe to fill its container, adjusted for larger display */
+            height: 500px; /* Increases height for better visibility */
+            max-width: 100%; /* Ensures iframe responsiveness within its container */
+        }
+
+        .image-caption {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+            text-align: center; /* Centers the caption text */
+        }
+
         .map-and-image-container {
             display: flex;
             justify-content: space-between; /* Adjust this as needed, you can use flex-start for no gap */
@@ -40,25 +89,15 @@
             margin-right: 0;
         }
 
-        .title-background {
-            background-image: url(img/An\ armed\ ranger\ accompanies\ every\ hike\ in\ Kruger.jpg); /* Path to your image */
-            background-size: cover; /* Ensures the background covers the available space */
-            background-position: center; /* Centers the background image */
-            color: white; /* Adjust text color for readability */
-            text-align: center; /* Centers the title text */
-            padding: 20px 0; /* Adjust padding to increase the container's height */
-            min-height: 1024px;
-            }
-
         h1 {
             font-size: 55px; /* Larger font size */
             font-weight: bold; /* Bolder font */
             color: #333; /* Dark grey color */
             text-align: left; /* Left align */
-            margin-bottom: 20px; /* Adds some space below the title */
+            margin-bottom: 5px; /* Adds some space below the title */
             font-family: 'Arial', sans-serif; /* Common font family */
             max-width: 41%;
-            top: 10px; 
+            top: 5px; 
             position: absolute;
             
         }
@@ -86,6 +125,28 @@
             text-align: left !important; /* Ensures text is aligned to the left */
             margin-top: 30px; /* Space above the header */
         }
+
+        h4 {
+            font-size: 20px; /* Slightly smaller than H3 for hierarchical structure */
+            font-weight: 300; /* Bold to stand out */
+            color: #777; /* Earthy brown, adjusts according to your theme */
+            margin-bottom: 15px; /* Adds some space below the heading */
+            padding-top: 10px; /* Space above the heading */
+            border-bottom: 0.5px solid #eee; /* A subtle earthy line to underscore the title */
+            font-family: 'Arial', sans-serif; /* Consistency with other headings */
+            text-align: left; /* Aligns text to the left */
+        }
+
+        h5 {
+            font-size: 20px; /* Slightly smaller than H3 for hierarchical structure */
+            font-weight: 580; /* Bold to stand out */
+            color: #434343; /* Earthy brown, adjusts according to your theme */
+            margin-bottom: 15px; /* Adds some space below the heading */
+            padding-top: 10px; /* Space above the heading */
+            font-family: 'Arial', sans-serif; /* Consistency with other headings */
+            text-align: center; /* Aligns text to the left */
+        }
+
 
         p {
             font-size: 18px; /* Comfortable reading size */
@@ -119,12 +180,44 @@
             padding-right: 20px; /* Adds some space between the text and the graph */
             width: 99%;
         }
+        #rhinoPoachingImpact {
+            opacity: 0; /* Start invisible */
+            transform: translateY(50px); /* Start slightly lower */
+            transition: all 0.5s ease-out; /* Smooth transition for the toggle */
+        }
+
+        #rhinoPoachingImpact.visible {
+            opacity: 1; /* Fully visible */
+            transform: translateY(0); /* Move to original position */
+        }
 
         .graph-container {
             flex: 1; /* Allows the container to grow */
-            max-width: 70%; /* Limits width to less than half of the parent container */
-            margin-top: 80px;
+            max-width: 65%; /* Limits width to less than half of the parent container */
+            margin-top: 50px;
         }
+        .graph-container iframe {
+            opacity: 0; /* Start invisible */
+            transform: scale(0.95); /* Start slightly scaled down */
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out; /* Smooth transition */
+        }
+
+        .graph-container2 {
+            flex: 1; /* Allows the container to grow */
+            max-width: 65%; /* Limits width to less than half of the parent container */
+            margin-top: 50px;
+        }
+        .graph-container iframe {
+            opacity: 0; /* Start invisible */
+            transform: scale(0.95); /* Start slightly scaled down */
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out; /* Smooth transition */
+        }
+
+        #rhinoPoachingImpact.visible .graph-container iframe {
+            opacity: 1; /* Fade in to full visibility */
+            transform: scale(1); /* Scale back to normal */
+        }
+
 
         .graph-caption {
             font-size: 14px; /* Smaller font size for the caption */
@@ -136,41 +229,6 @@
             margin-right: auto;
             max-width: 70%;
             margin-bottom: 10px;
-        }
-        
-        .data-analysis2 {
-            display: flex;
-            flex-direction: column; /* Stack children vertically */
-            align-items: left; /* Center-align items horizontally */
-    
-        }
-
-        .text-container2 {
-            width: 99%; /* Full width to precede the graphs */
-            text-align: center; /* Optionally center the text */
-            margin-bottom: 10px; /* Space before the graphs */
-        }
-
-        .graph-container2 {
-            display: flex;
-            flex-direction: column; /* Stack graphs vertically if side by side isn't working well */
-            align-items: center; /* Center-align the graphs */
-            width: 100%; /* Use the full width of the container */
-        }
-
-        .graph-container2 iframe {
-            width: 90%; /* Set to a percentage of the container's width for responsiveness */
-            max-width: 964px; /* Set a max-width to prevent overly large graphs */
-            height: 645px; /* Adjust height as needed */
-            margin-bottom: 0px; /* Reduced space below the iframe */
-        }
-
-        .graph-caption2 {
-            width: 80%; /* Match iframe width */
-            text-align: center; /* Center-align the caption */
-            font-size: 14px;
-            color: #666;
-            margin-bottom: 10px; /* Space after the caption */
         }
         
         .media-highlight-section {
@@ -251,6 +309,28 @@
             margin-top: 5px;
         }
 
+        .graphs-container {
+            display: flex;
+            justify-content: space-between; /* Adjust this value as needed */
+            flex-wrap: wrap; /* Allows the graphs to wrap on smaller screens */
+            align-items: flex-start;
+        }
+
+        .graph-item {
+            width: 46%; /* Adjust this value based on your layout needs */
+            margin-bottom: 10px; /* Provides space between rows when they wrap */
+            text-align: center; /* Centers the content */
+        }
+
+        .graph-item h5, .graph-item p {
+            margin: 10px 0; /* Adds space around the title and caption */
+        }
+
+        @media (max-width: 768px) {
+            .graph-item {
+                width: 100%; /* Stacks the graphs on smaller screens */
+            }
+        }
     </style>
 </head>
 
@@ -291,59 +371,60 @@
         
     </section>
 
+     <!-- Rhino Poaching Analysis Section -->
+
     <section>
+        <section id="rhinoPoachingImpact" class="data-analysis">
         <section class="data-analysis">
             <div class="text-container">
         <h3>The Impact of Rhino Poaching on Population</h3>
-        <p>This graph presents a detailed analysis of rhino poaching and population trends within Kruger National Park over the last decade. Data utilized in this analysis were meticulously sourced from the South African National Parks Annual Reports, supplemented by archived reports and media releases from the South African Department of Forestry, Fisheries, and the Environment. Compiled using Google Sheets, the visual representation highlights the relationship between poaching activities and the rhino population within the park.</p>
+        <p>This graph presents a detailed analysis of rhino poaching and population trends within Kruger National Park over the last decade. Data utilized in this analysis were sourced from the South African National Parks Annual Reports, supplemented by archived reports and media releases from the South African Department of Forestry, Fisheries, and the Environment. Compiled using Google Sheets, the visual representation highlights the relationship between poaching activities and the rhino population within the park.</p>
 
             <p>This analysis reveals that poaching has been a significant factor in the decline of the rhino population throughout the years. It also points out an interesting dynamic: as the rhino population within the park decreased, the frequency of poaching incidents followed a similar downward trajectory. This pattern can likely be attributed to the dwindling number of available rhinos to poach, combined with the implementation of increasingly aggressive anti-poaching measures within the park. A notable strategy has been the <strong>dehorning of approximately 70% of rhinos</strong> within KNP by the end of 2022, aimed at making them less attractive targets for poachers.</p>
             
             <p>Beyond poaching, additional factors behind the declining rhino numbers in Kruger, include natural mortality and the strategic relocation of rhinos. These relocations, whether natural or orchestrated by conservation authorities, are part of efforts to transfer rhinos to areas with lower poaching risks.</p>
         </div>
         <div class="graph-container">
-            <iframe 
-            width="1031" 
-            height="637" 
-            src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTDeJykclL9yAy0a_p5qBwpbVstFS84W2BTsPaBIF3WBd0IgCSDuEuP8QYc3ujQJh8avdfptDweAfpd/pubchart?oid=1657187847&amp;format=interactive" 
-            frameborder="0" 
-            scrolling="no">
+            <iframe width="1010" height="624" seamless frameborder="0" scrolling="no" 
+            src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTDeJykclL9yAy0a_p5qBwpbVstFS84W2BTsPaBIF3WBd0IgCSDuEuP8QYc3ujQJh8avdfptDweAfpd/pubchart?oid=1657187847&amp;format=interactive">
         </iframe>
         <p class="graph-caption">Data sourced from South African National Parks Annual Reports and other official releases. <strong>Note there are two scales on the vertical axes.</strong></p>
      </div>
     </section>
     
      <!-- Elephant Poaching Analysis Section -->
-     <section class="data-analysis2">
-        <h3>Elephant Poaching: A Less Significant Threat to Population</h3>
-        <div class="text-container2">
-            <p>As opposed to rhino poaching, elephant poaching for ivory is not as prevalent in KNP, despite its significant elephant population, as well as the staggering market value for ivory in the global illegal wildlife trade.
-                For example, the graphs below visualize Kruger's estimated annual elephant population and annual poaching numbers in the park. 
-                Unlike the case with rhinos, the park's large elephant population has not been significantly affected by poaching.</p>
+     
+     <section class="data-analysis">
+        <div class="text-container">
+            <h3>Elephant Poaching: A Less Significant Threat to Population</h3>
+            <p>
+                As opposed to the pressing issue of rhino poaching, elephant poaching in KNP has not been as significant, 
+                despite the park hosting a considerable elephant population and the high market value and demand for ivory globally. 
+            </p>
+            <p>
+                The history of elephants in KNP is a testament to conservation successes and challenges alike. 
+                In 1903, no elephants roamed the area of today's park, but by the establishment of the Sabie Game Reserve in 1923 — the precursor of KNP — approximately 100 elephants had migrated from Mozambique. 
+                Over the decades, this number surged, driven by natural growth and further migrations, necessitating management interventions. By 1965, the population reached 7,000, and by 1970, it had grown to 8,821. 
+                Concerns over ecological balance and the impacts of an unchecked elephant 
+                population led to a culling campaign between 1967 and 1995, during which about <strong>500 elephants were culled</strong> and 2,500 relocated. Despite these efforts, the population's growth rate did not wane significantly, illustrating the species' robust reproductive capacity. 
+                By 2003, the population was recorded at 13,566, and this upward trend has continued, with the population growing at an estimated annual average of 4%, nearing 30,000 by 2023.
+            </p>
+            <p>     
+            The graph below illustrates the trajectory of Kruger's elephant population alongside annual poaching figures. In  contrast to rhinos, the elephant population within KNP has largely remained unaffected in the face of poaching pressures.
+                
+                For further details, visit Koehl's Elephant Encyclopedia online [Koehl, D. (2024). Kruger National Park, Elephant Encyclopedia. Available at: <a href="https://www.elephant.se/location2.php?location_id=38" target="_blank">Elephant Encyclopedia</a>.
+            </p>
             </div>
         <div class="graph-container2">
             <!-- Graph 2 for Elephant Data -->
-            <iframe 
-                width="1030" 
-                height="640" 
-                seamless frameborder="0" 
-                scrolling="no" 
-                src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTDeJykclL9yAy0a_p5qBwpbVstFS84W2BTsPaBIF3WBd0IgCSDuEuP8QYc3ujQJh8avdfptDweAfpd/pubchart?oid=1441560616&amp;format=interactive">
+            <iframe width="1019" height="631" seamless frameborder="0" scrolling="no" 
+            src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTDeJykclL9yAy0a_p5qBwpbVstFS84W2BTsPaBIF3WBd0IgCSDuEuP8QYc3ujQJh8avdfptDweAfpd/pubchart?oid=637839568&amp;format=interactive">
+
             </iframe>
-            <p class="graph-caption">Data for this graph were compiled from SANParks' Annual Reports, Africa Geographic, and National Geographic. For certain years, population figures are estimated based on average growth rates.</p>
+            <p class="graph-caption">Data for this graph were compiled from SANParks' Annual Reports, Africa Geographic, and National Geographic. For certain years, population figures are estimated based on average growth rates. <strong>Note there are two scales on the vertical axes.</strong></p>
         </div>
-            <div class="graph-container2">
-                <!-- Graph 1 for Elephant Data -->
-                <iframe 
-                    width="1037" 
-                    height="641" 
-                    seamless frameborder="0" 
-                    scrolling="no" 
-                    src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTDeJykclL9yAy0a_p5qBwpbVstFS84W2BTsPaBIF3WBd0IgCSDuEuP8QYc3ujQJh8avdfptDweAfpd/pubchart?oid=1271314465&amp;format=interactive">
-            </iframe>
-                <p class="graph-caption">Data for this graph were sourced from SANParks Annual Reports, Oxpeckers' 'Elephant Poaching on the Rise in Kruger', ENS-Newswire, and multiple reports from the Department of Environmental Affairs (DEA) and Department of Environment, Forestry and Fisheries (DEFF) spanning 2017 to 2021, including the 'Progress on Integrated Strategic Management of Rhinoceros', 'Department Report on Rhino Poaching in 2020', and 'Creecy/Ranger and Rhino Report in 2021.'</p>
-            </div>
-    </section>
+        </section>
+ 
    <!--Media Attention Section-->
    <section class="media-section">
     <section class="media-highlight-section">
@@ -363,7 +444,7 @@
                 </div>
                 <div class="media-video">
                     <iframe width="640" height="360" src="https://abcnews.go.com/video/embed?id=84311669" allowfullscreen frameborder="0"></iframe>
-                    <p class = "video-caption">News clip from ABC News article, "Rhino poaching on the rise in South Africa, new figures show," published February 28, 2024 by Emma Ogao and Liezl Thom
+                    <p class = "video-caption">News clip from ABC News article, "Rhino poaching on the rise in South Africa, new figures show," published February 28, 2024 by Emma Ogao and Liezl Thom.
                 Video caption reads "National park in South Africa addresses rhino poaching problem. At Kruger National Park in South Africa, rhino numbers have decreased by a staggering 80%, but new "miracle" baby rhinos are giving conservationists hope."
             </p>
 
@@ -375,8 +456,7 @@
                     <img src="img/NatGeo Article.png" alt="National Geographic Article">
                 </a>
              </div>
-    
-            </section>
+         </section>
     <h3>
         The Rise of Militarized Anti-Poaching Measures
     </h3>
@@ -390,39 +470,17 @@
             surveillance technology, including drones, helicopters, remote sensing, and Geographic Information Systems (GIS). 
             Notably, entities like the South African National Defence Force (SANDF) and <a href=https://rhino-force.org/projects.html>Hemmersbach Rhino Force</a> have been instrumental in these efforts.
         </p> 
-
         <p> 
             Historically, during the apartheid era, the SANDF was deployed within KNP to secure the border against the movement of anti-apartheid activists and Mozambican refugees, 
             involving the construction of military bases and electrification of certain border segments. Post-apartheid, the SANDF's involvement in anti-poaching operations within the
              park has served as a means of justifying its continued existence, 
             highlighting a broader trend of intertwining military presence with conservation practices beyond South Africa's borders, as noted by Lunstrum (2014).
-            
-            
         </p> 
-
-
-
         <p>
             The Hemmersbach Rhino Force further exemplifies this approach by safeguarding KNP's western border from poaching syndicates. This paramilitary group utilizes sniffer dogs, patrols the park perimeter with military-grade surveillance equipment, 
             detains unauthorized entrants, supports law enforcement operations, and assists in crisis situations like social unrest or combating illegal activities within the park.
         </p>
-
-        <p> 
-            However, the deployment of such militarized measures has not been without controversy or consequence. The period between 2010 and 2015 saw an estimated <strong>200 suspected poachers killed</strong> and the loss of seven SANDF soldiers in KNP, demonstrating the lethal 
-            implications of these anti-poaching strategies (Pinnock 2023).
-
-        </p>
-
-        
-        
-    <div class="antipoaching-section">
-                <!-- Chart iframe here -->
-                <iframe width="1099" height="681" seamless frameborder="0" scrolling="no" 
-                src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTDeJykclL9yAy0a_p5qBwpbVstFS84W2BTsPaBIF3WBd0IgCSDuEuP8QYc3ujQJh8avdfptDweAfpd/pubchart?oid=2094688794&amp;format=interactive">
-            </iframe>
-            <div class="graph-caption">
-                Source: Data compiled from various releases by the South African Department of Environmental Affairs (ZA DEA), including Rhino Poaching Statistics (20 November 2014), Arrest Statistics Media Releases (2014/2015, 2016), National Environmental Compliance Enforcement Reports (2017), and Progress on Integrated Strategic Management of Rhinoceros (ISMR) reports (January 2018, September 2018, February 2019, and the first half of 2019).
-            </div>
+       
             
         
 
@@ -431,28 +489,27 @@
             <div class="image-caption-container">
                 <img src="img/militarized_antipoaching_rhino_force.jpg" alt="Militarized Anti-Poaching Rhino Force">
                 <p class="image-caption">
-                    Image: Hemmersbach Rhino Force Squad
+                    Image: 
                     <a href="https://rhino-force.org/projects.html" target="_blank">
-                        Rhino Force
-                    </a>.
+                        Hemmersbach Rhino Force
+                    </a> Squad.
                 </p>
             </div>
             <div class="image-caption-container">
                 <img src="img/hemmer_rhino_force.jpg" alt="Hemmer Rhino Force">
                 <p class="image-caption">
-                    Image: Hemmersbach Rhino Force Team in the Field Patrolling
+                    Image:
                     <a href="https://rhino-force.org/projects.html" target="_blank">
-                        Rhino Force
-                    </a>.
+                        Hemmersbach Rhino Force
+                    </a>in the Field Patrolling.
                 </p>
             </div>
             <div class="image-caption-container"> 
                 <img src="img/Anti Poaching Unit at Singita Sabi Sand.jpeg" alt="Anti Poaching Unit at Singita Sabi Sand">
                 <p class="image-caption">
-                    Image: Anti Poaching Unit at Singita Sabi Sand
-                    <a href="https://singita.com/2021/02/anti-poaching-unit-at-singita-sabi-sand-makes-strides/" target="_blank">
+                    Image: K9 Anti Poaching Unit at Sabi Sand Wildtuin. <a href="https://singita.com/2021/02/anti-poaching-unit-at-singita-sabi-sand-makes-strides/" target="_blank">
                         Singita
-                    </a>, October 22, 2018.
+                    </a>, February 2012.
                 </p>
             </div>
             <!-- Add another image here if needed -->
@@ -467,15 +524,118 @@
         </div>
         </div>
     </div>
-    
+    <p> 
+        However, the deployment of such militarized measures has not been without controversy or consequence. From 2010 to 2015, it's estimated that around <strong>200 suspected poachers killed</strong>, 
+        and the SANDF suffered the loss of seven soldiers within KNP (Pinnock 2023). 
+        
+        This highlights the deadly consequences of these anti-poaching measures. The graph below illustrates this continuous trend, 
+        emphasizing the serious repercussions of these enforcement tactics.
+    </p>
 
-  
+    <p>
+        Between 2013 and 2016, there was a noticeable increase in both the arrests and fatalities related to poaching, marking a period where anti-poaching efforts were significantly bolstered. 
+        This time saw considerable support from various organizations aimed at enhancing the capabilities of anti-poaching units within SANParks. 
+        Notably, the Gallet Group made a substantial donation of R359,100.00, and Lasher Tools committed to a donation of R332,158, with an ambitious target to reach R2 million by July 2016, as highlighted in a SANParks media release dated February 22, 2016. 
+        Additionally, the Global Exploration & Oceanographic Society contributed direct financial support to the Dyck Advisory Group Conservation Trust (DAG) from 2015 through 2018. This funding aimed to curb the influx of poachers entering Kruger National Park 
+        from the Mozambique border, indicating a concerted effort to address the challenges posed by poaching through financial and material support.
+    </p>
 
+    <div class="antipoaching-section">
+                <!-- Chart iframe here -->
+                <iframe width="1099" height="681" seamless frameborder="0" scrolling="no" 
+                src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTDeJykclL9yAy0a_p5qBwpbVstFS84W2BTsPaBIF3WBd0IgCSDuEuP8QYc3ujQJh8avdfptDweAfpd/pubchart?oid=2094688794&amp;format=interactive">
+            </iframe>
+            <div class="graph-caption">
+                Source: Data compiled from various releases by the South African Department of Environmental Affairs (ZA DEA), including Rhino Poaching Statistics (20 November 2014), Arrest Statistics Media Releases (2014/2015, 2016), National Environmental Compliance Enforcement Reports (2017), and Progress on Integrated Strategic Management of Rhinoceros (ISMR) reports (January 2018, September 2018, February 2019, and the first half of 2019).
+            </div>
+   
 </section>
 
+<h3>
+    Understanding the Drivers of Poaching 
+ </h3>
+    <p>
+    Economic motivations are at the core of rhino poaching, largely driven by poverty, limited economic opportunities, and the lucrative demand for rhino horn in markets
+     like Vietnam and Hong Kong. South Africa, noted for having the highest levels of economic inequality globally, presents a backdrop where the illegal rhino horn trade offers 
+     significant financial incentives, especially to those struggling to make ends meet.
+    </p>
+    <p> 
+        This perspective is supported by a report titled "The People Beyond the Poaching: Interviews with Convicted Offenders in South Africa," released by TRAFFIC in September 2020. 
+        The report reveals that a unanimous 100% of the interviewees, all of whom were involved in illegal wildlife trafficking (IWT), 
+        cited income generation as the primary motivator for their actions. 73% of these individuals reported dire economic circumstances, with 7% not having enough income to survive and 
+        66% only managing to cover basic necessities like food, water, and shelter. Importantly, 54 of the interviewees were directly involved in the illegal rhino horn trade within Kruger
+        National Park.
+    </p>
+    <p> 
+        These statistics highlight the desperate economic conditions that drive individuals toward rhino poaching, stressing the need to address the underlying socioeconomic challenges. 
+        The allure of the illegal rhino horn trade, coupled with South Africa's stark economic disparities, illustrates the complex interplay of factors contributing to the poaching crisis. 
+        Moving beyond the reliance on militarized anti-poaching measures, which prioritize surveillance and enforcement, is crucial. Effective conservation efforts and the protection of endangered species like rhinos necessitate addressing the root causes driving poaching. 
+        Focusing on the socioeconomic factors at play offers a more sustainable path towards resolving the challenges facing wildlife conservation. 
+    </p>
+    
+    <div class="images-container">
+        <div class="media-item">
+            <img src="img/TRAFFIC_Interviews.jpg" alt="TRAFFIC Interview Results Table">
+            <p class="image-caption">
+                Factors Influencing or Rationalizing Offenders' Engagement in IWT. Adapted from 
+                <a href="https://www.traffic.org/publications/reports/the-people-beyond-the-poaching/" target="_blank">"The People Beyond the Poaching"</a> 
+                report by Moneron, Armstrong, and Newton (2020), published by TRAFFIC International.
+            </p>
+        </div>
+        <div class="media-item">
+            <iframe title="vimeo-player" src="https://player.vimeo.com/video/460262003?h=cce368043c" width="640" height="360" frameborder="0"    allowfullscreen></iframe>
+            <p class="image-caption">
+                Video: An Inside Look at TRAFFIC's Interviews with Convicted Poachers in South Africa. This video sheds light on the motivations and circumstances that 
+                drive individuals to poaching. 
+                Published on 24 September 2020 by TRAFFIC. Access the full report and details at <a href="https://www.traffic.org/publications/reports/the-people-beyond-the-poaching/">'The People Beyond the Poaching'</a> on TRAFFIC's website
+            </p>
+        </div>
+    </div>
+    <section class="data-analysis">
+        <h3>A Look Into the Geographical Dynamics of Rhino Horn Trafficking</h3>
+        
+        <p>       
+        South Africa harbors approximately 75% of the world's remaining rhinos, with KNP serving as a primary sanctuary. 
+                The demand for rhino horn has seen a decline in recent years, paralleled by a reduction in poaching activities. 
+                Notably, from 2008 to 2019, there was a marked increase in the seizure of rhino horns internationally, indicating heightened efforts to combat this illegal trade. 
+                Seizures predominantly occur in airports, with traffickers favoring air travel for smuggling, often hiding the horns in luggage. 
+                Data from the World Wildlife Report (2010-2017) highlights Chinese, Vietnamese, Indian, and South African nationals as the most frequent perpetrators of rhino horn smuggling. 
+                A significant number of these incidents involve Chinese suspects apprehended in China or South Africa, and Vietnamese suspects in Vietnam or Mozambique, pointing to China and Vietnam as the primary end markets.
+               </p>
+               <p>
+               This situation underscores a stark reality: demand for rhino horn, especially among the growing upper-middle classes in Vietnam and Hong Kong, combined with the socio-economic challenges faced in South Africa—such as severe poverty and limited economic opportunities—continues to fuel poaching in KNP. 
+               Economic disparities thus emerge as a critical factor in the persistence of this illegal trade, highlighting the necessity of addressing both demand and supply-side issues to effectively combat poaching. 
+               This analysis draws upon findings from the World Wildlife Report, released by the UNODC on July 9, 2020, offering a comprehensive overview of wildlife trafficking trends.
+            </p> 
+        
+        <div class="graphs-container">
+            
+            <div class="graph-item">
+                
+                <iframe width="871" height="538" seamless frameborder="0" scrolling="no" 
+                src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTDeJykclL9yAy0a_p5qBwpbVstFS84W2BTsPaBIF3WBd0IgCSDuEuP8QYc3ujQJh8avdfptDweAfpd/pubchart?oid=444202320&amp;format=interactive">
+
+                </iframe>
+                <p class="graph-caption">Caption for the First Graph</p>
+            </div>
+            
+            <div class="graph-item">
+               
+                <iframe width="817" height="513" seamless frameborder="0" scrolling="no" 
+                src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTDeJykclL9yAy0a_p5qBwpbVstFS84W2BTsPaBIF3WBd0IgCSDuEuP8QYc3ujQJh8avdfptDweAfpd/pubchart?oid=1102224657&amp;format=interactive">
+
+                </iframe>
+                <p class="graph-caption">Caption for the Second Graph</p>
+            </div>
+        </div>
+        
+        <h5>Trafficking Flow Map of African Rhino Horn (2014-2018)</h5>
+                <img src="img/Trafficking_Rhino_Horn_Graphic.jpg" alt="Trafficking Rhino Horn Graphic">
+                <p class="graph-caption">Source: UNODC World WISE Database. The year 2018 is based on partial data.</p>
+                
+    </section>    
 </article>
 
 <script src="script.js"></script>
 </body>
 </html>
-

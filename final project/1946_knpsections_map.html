@@ -6,65 +6,177 @@
     <title>Kruger National Park Poaching per Ranger Section</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     <style>
-    #map { width: 100%; height: 780px; }
+
+    body {
+                background-color: #393737; /* Set your desired background color here */
+            }
+    h1 {
+        color: white; 
+        text-align: center;
+}
+    #map {
+    width: 90%;
+    height: 800px;
+    position: relative;
+    margin: 0 auto; /* Centers the map horizontally */
+}
     .custom-popup .leaflet-popup-content { 
         font-size: 16px; /* Adjust font size as needed */
     }
-</style>
+
+    .legend {
+    position: absolute;
+    bottom: 70px;
+    right: 135px;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 18px;
+    z-index: 1001; /* Ensure it's above other map layers */
+    }
+
+    .legend h4 {
+        margin: 0 0 5px;
+    }
+
+    .legend div {
+        margin-bottom: 5px;
+    }
+
+    .legend-circle {
+        display: inline-block;
+        border-radius: 50%;
+        margin-right: 5px;
+        vertical-align: middle; /* Align the circle vertically with the text */
+    }
+
+    #map-instructions {
+            text-align: center;
+            margin-top: 65px; /* Adjust based on layout */
+            padding: 5px;
+            background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent background for readability */
+            color: #ffffff; /* Text color */
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2); /* Optional: adds subtle shadow for depth */
+            font-size: 15px;
+            position: absolute; /* Position absolute to place it above the map */
+            top: 15px; /* Distance from the top of the map */
+            left: 50%; /* Center horizontally */
+            transform: translateX(-50%);
+            z-index: 1000; /* Ensure it's above the map if overlapping */
+        }
+
     </style>
 </head>
 <body>
-    <h1>Kruger National Park: Distribution of Poaching Across Ranger Sections in 1946</h1>
-    <div id="map"></div>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script src = "1946_knpsections_poach.js"></script> 
+    <!-- Leaflet Heatmap Plugin -->
+    <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
 
-    <script>
-       var map = L.map('map').setView([-23.988, 31.554], 7.5);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '© OpenStreetMap contributors'
+        <h1>Kruger National Park: Distribution of Poaching Across Ranger Sections in 1946</h1>
+        <div id="map"></div>
+        <!-- Your existing HTML for legend and other elements -->
+
+        <div id="legend" class="legend">
+            <h4>Legend</h4>
+            <div id="combined-legend">
+                <div><span class="legend-circle" style="background-color: #FED976; width: 10px; height: 10px;"></span> low poaching</div>
+                <div><span class="legend-circle" style="background-color: #FC4E2A; width: 15px; height: 15px;"></span> moderate poaching</div>
+                <div><span class="legend-circle" style="background-color: #800026; width: 25px; height: 25px;"></span> high poaching</div>
+            </div>
+        </div>
+
+        <div id="map-instructions">
+            Select a marker to view details about the section, including the responsible ranger and insights into threats as evaluated in the Warden's Grading of Sections Report.
+        </div>
+    
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+        <script src="1946_knpsections_poach.js"></script>
+
+    
+        <script>
+        var map = L.map('map').setView([-23.988, 31.554], 8.45);
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012'
         }).addTo(map);
     
-
-        var markers = {};
-
-        function updateMap(year) {
-    // Iterate over each feature in the sections' data
-    sections.features.forEach(function(feature) {
-        const incidentsData = feature.properties.PoachingData.find(data => data.Year === year);
-
-        // Skip this iteration if there's no data for the given year
-        if (!incidentsData) return;
-
-        const lat = feature.properties.name_sections_Lat;
-        const lng = feature.properties.name_sections_Long;
-        const name = feature.properties.Name;
-        const incidents = incidentsData.Incidents;
-        const quote = feature.properties.RangerQuote || "No quote available."; // Provide a fallback if no quote is available
-        const rangerName = feature.properties.RangerName || "Unknown Ranger"; // Provide a fallback if no ranger name is provided
-
-        const baseSize = 5;
-        
-        const markerSize = baseSize + (incidents);
-
-        // Create a circle marker for each section, setting its options and binding a popup with detailed info
-        markers[name] = L.circleMarker([lat, lng], {
-                    radius: markerSize,
-                    fillColor: "#ff7800",
-                    color: "#000",
-                    weight: 1,
-                    opacity: 1,
-                    fillOpacity: 0.8
-                }).addTo(map).bindPopup(`<h3>Section: ${name}</h3>
-                                         <p>Ranger: ${rangerName}</p>
-                                         <p>Quote: "${quote}"</p>`, {
-                                             className: 'custom-popup'
-                                         });
+        sections.features.forEach(function(feature) {
+            var lat = feature.properties.name_sections_Lat;
+            var lng = feature.properties.name_sections_Long;
+            var name = feature.properties.Name;
+            var poachingData1946 = feature.properties.PoachingData.find(function(data) {
+                return data.Year === 1946;
             });
+            var incidents = poachingData1946 ? poachingData1946.Incidents : 0; // Default to 0 if no data for 1946
+            var rangerQuote = feature.properties.RangerQuote;
+            var rangerName = feature.properties.RangerName;
+
+        // Determine fillColor based on the number of incidents
+        var fillColor;
+        if (incidents <= 10) {
+            fillColor = "#FED976"; // Golden Rod
+        } else if (incidents > 10 && incidents <= 20) {
+            fillColor = "#FC4E2A"; // Peru
+        } else if (incidents > 20) {
+            fillColor = "#800026"; // Dark Red
+        } else {
+            fillColor = "#CCCCCC"; // Default color if no data
         }
-        
-        updateMap(1946); 
-    </script>
-</body>
-</html>
+
+        // Marker size reflects intensity of poaching
+        var baseSize = 5; // Base size for markers
+        var scalingFactor = 1; // Adjust scaling factor to influence how much the incident count affects size
+        var markerSize = baseSize + (incidents * scalingFactor); // Calculate dynamic marker size
+
+        // Create a circle marker for this section with dynamic radius based on incidents
+        var marker = L.circleMarker([lat, lng], {
+            color: '#000',
+            weight: 1,
+            fillColor: fillColor,
+            fillOpacity: 0.8,
+            radius: markerSize // Use dynamic size for radius
+        }).addTo(map);   
+
+        // Bind a popup with information about the section
+        marker.bindPopup(`<h3>Section: ${name}</h3><p>Ranger: ${rangerName}</p><p>Quote: "${rangerQuote}"</p>`);
+    });
+
+    function populateLegend() {
+        var colorLegend = document.getElementById('color-legend');
+        var sizeLegend = document.getElementById('size-legend');
+
+        // Example color categories
+        var colors = [
+            { label: "0-20 incidents", color: "#F7DC6F" },
+            { label: "21-40 incidents", color: "#FC4E2A" },
+            { label: "61+ incidents", color: "#800026" }
+        ];
+
+        colors.forEach(function(category) {
+            var item = document.createElement('div');
+            item.innerHTML = `<i style="background: ${category.color}; width: 18px; height: 18px; border-radius: 50%; display: inline-block;"></i> ${category.label}`;
+            colorLegend.appendChild(item);
+        });
+
+    // Example sizes (use representative SVGs or styled divs to illustrate size)
+        var sizes = [
+            { label: "Small (0-20 incidents)", size: "10px" },
+            { label: "Medium (21-40 incidents)", size: "15px" },
+            { label: "Large (41+ incidents)", size: "20px" }
+        ];
+
+        sizes.forEach(function(category) {
+            var item = document.createElement('div');
+            item.style.display = 'flex';
+            item.style.alignItems = 'center';
+            item.innerHTML = `<div style="width: ${category.size}; height: ${category.size}; background: #777; border-radius: 50%; margin-right: 5px;"></div> ${category.label}`;
+            sizeLegend.appendChild(item);
+        });
+    }
+
+    populateLegend();
+
+        </script>
+    </body>
+    </html>

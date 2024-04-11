@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kruger National Park Poaching per Ranger Section</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+
+    <style>
+
+    body {
+                background-color: #393737; /* Set your desired background color here */
+            }
+    h1 {
+        color: white; 
+        text-align: center;
+}
+    #map {
+    width: 87%;
+    height: 800px;
+    position: relative;
+    margin: 0 auto; /* Centers the map horizontally */
+}
+
+    .custom-popup .leaflet-popup-content { 
+        font-size: 16px; /* Adjust font size as needed */
+    }
+
+    .legend {
+    position: absolute;
+    bottom: 70px;
+    right: 135px;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 18px;
+    z-index: 1001; /* Ensure it's above other map layers */
+    }
+
+    .legend h4 {
+        margin: 0 0 5px;
+    }
+
+    .legend div {
+        margin-bottom: 5px;
+    }
+
+    .legend-circle {
+        display: inline-block;
+        border-radius: 50%;
+        margin-right: 5px;
+        vertical-align: middle; /* Align the circle vertically with the text */
+    }
+
+    #map-instructions {
+            text-align: center;
+            margin-top: 65px; /* Adjust based on layout */
+            padding: 5px;
+            background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent background for readability */
+            color: #ffffff; /* Text color */
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2); /* Optional: adds subtle shadow for depth */
+            font-size: 15px;
+            position: absolute; /* Position absolute to place it above the map */
+            top: 15px; /* Distance from the top of the map */
+            left: 50%; /* Center horizontally */
+            transform: translateX(-50%);
+            z-index: 1000; /* Ensure it's above the map if overlapping */
+        }
+
+        
+
+    </style>
+</head>
+
+<body>
+    <h1>Kruger National Park: Distribution of Poaching Across Ranger Sections in 1946</h1>
+
+    <button id="toggleMap" 
+    style=
+    "position: absolute; 
+    top: 20px; 
+    left: 10px; 
+    z-index: 1000; 
+    background-color: #1a5ac9bd; color: #ffffff; 
+    border: 1px solid #313131; cursor: pointer; padding: 10px 20px; 
+    border-radius: 4px; font-size: 15px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">Toggle Heatmap</button>
+
+
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="leaflet-heat.js"></script>
+    <script src = "1946_knpsections_poach.js"></script> 
+
+        <div id="legend" class="legend">
+            <h4>Legend</h4>
+            <div id="combined-legend">
+                <div><span class="legend-circle" style="background-color: #FED976; width: 10px; height: 10px;"></span> low poaching</div>
+                <div><span class="legend-circle" style="background-color: #FC4E2A; width: 15px; height: 15px;"></span> moderate poaching</div>
+                <div><span class="legend-circle" style="background-color: #800026; width: 25px; height: 25px;"></span> high poaching</div>
+            </div>
+        </div>
+
+        <div id="map-instructions">
+            Select a marker to view details about the section, including the responsible ranger and insights into threats as evaluated by the Warden and ranger in charge.
+        </div>
+      
+
+    <script>
+    var map = L.map('map').setView([-23.988, 31.554], 8.45);
+
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012'
+    }).addTo(map);
+
+    var markerLayers = L.layerGroup().addTo(map);
+    var heatmapLayer = L.heatLayer([], {radius: 35, blur: 30});
+
+    // Function to populate and add heatmap data
+    function createHeatmap() {
+            var heatData = sections.features.map(function(feature) {
+                var lat = feature.properties.name_sections_Lat;
+                var lng = feature.properties.name_sections_Long;
+                var intensity = (feature.properties.PoachingData.find(data => data.Year === 1946)?.Incidents || 0) * 50; // Adjust the multiplier as needed
+                return [lat, lng, intensity];
+            });
+            heatmapLayer.setLatLngs(heatData);
+        }
+
+        // Function to toggle between heatmap and markers
+        function toggleHeatmap() {
+            if (map.hasLayer(heatmapLayer)) {
+                // Heatmap is currently shown, so we switch to markers
+                map.removeLayer(heatmapLayer); // Remove the heatmap
+                markerLayers.addTo(map); // Add the marker layers back to the map
+            } else {
+                // Markers are currently shown, so we switch to the heatmap
+                map.removeLayer(markerLayers); // Remove the marker layers
+                map.addLayer(heatmapLayer); // Add the heatmap layer to the map
+            }
+        }
+
+        document.getElementById('toggleMap').addEventListener('click', toggleHeatmap);
+
+      
+
+        // Helper functions to determine marker color and size based on incidents
+        function getFillColor(incidents) {
+            if (incidents <= 10) return "#FED976";
+            else if (incidents <= 20) return "#FC4E2A";
+            else return "#800026";
+        }
+
+        function getMarkerSize(incidents) {
+            return 5 + incidents;
+        }
+
+        // Function to add markers based on the sections data
+        function addMarkers() {
+            markerLayers.clearLayers(); // Clear existing markers first, if any
+            sections.features.forEach(function(feature) {
+                // Logic to create and add markers based on the feature data
+                var marker = L.circleMarker([feature.properties.name_sections_Lat, feature.properties.name_sections_Long], {
+                    color: '#000',
+                    weight: 1,
+                    fillColor: getFillColor(feature.properties.PoachingData.find(data => data.Year === 1946)?.Incidents),
+                    fillOpacity: 0.8,
+                    radius: getMarkerSize(feature.properties.PoachingData.find(data => data.Year === 1946)?.Incidents)
+                }).bindPopup(`<h3>Section: ${feature.properties.Name}</h3><p>Ranger: ${feature.properties.RangerName}</p><p>Quote: "${feature.properties.RangerQuote}"</p>`);
+                markerLayers.addLayer(marker);
+            });
+        }
+
+        // Populate markers initially
+        addMarkers();
+        
+        // Helper functions to determine marker color and size based on incidents
+        function getFillColor(incidents) {
+                    if (incidents <= 10) return "#FED976";
+                    else if (incidents <= 20) return "#FC4E2A";
+                    else return "#800026";
+                }
+
+                function getMarkerSize(incidents) {
+                    return 5 + incidents;
+                }
+
+                // Call createHeatmap to initialize heatmap data
+                createHeatmap();
+
+</script>
+
+</body>
+</html>

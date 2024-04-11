@@ -81,7 +81,7 @@ var sections = {
     "RangerName": "Ranger Wolhuter"
     }, "geometry": { "type": "MultiPolygon", "coordinates": [ ] } },
 
-{ "type": "Feature", "properties": { "Name": "Malelane", "Size_ha": null, "Shape__Are": null, "Shape__Len": null, "name_sections_Lat": -25.472, "name_sections_Long": 31.5088, 
+{ "type": "Feature", "properties": { "Name": "Malelane", "Size_ha": null, "Shape__Are": null, "Shape__Len": null, "name_sections_Lat": -25.392, "name_sections_Long": 31.5088, 
 "name_sections_Poaching": 1.8,
 "PoachingData": [
     { "Year": 1946, "Incidents": 30 }
@@ -89,7 +89,7 @@ var sections = {
 "RangerQuote": "The main hostile factor however, is the large native population, railway and faro employees in the west, and in the east, from Hectorspruit to the Section boundary, the inhabitants of the Tenbosch native area. A large proportion of the males in the latter are habitual idlers, and may be called professional poachers as they do no work, and the more prominent  among them are hardly out of gaol where they have served a sentence for poaching, than they are back again snaring game in the Park.",
 "RangerName": "Ranger James"
 }, "geometry": { "type": "MultiPolygon", "coordinates": [ ] } },
-{ "type": "Feature", "properties": { "Name": "Crocodile Bridge", "Size_ha": null, "Shape__Are": null, "Shape__Len": null, "name_sections_Lat": -25.3583, "name_sections_Long": 31.892, 
+{ "type": "Feature", "properties": { "Name": "Crocodile Bridge", "Size_ha": null, "Shape__Are": null, "Shape__Len": null, "name_sections_Lat": -25.2783, "name_sections_Long": 31.892, 
 "name_sections_Poaching": 5.93,
 "PoachingData": [
     { "Year": 1946, "Incidents": 20 }

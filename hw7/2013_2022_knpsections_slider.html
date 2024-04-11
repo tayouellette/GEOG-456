@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kruger National Park Poaching per Ranger Section</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <style>
+    body {
+            background-color: #393737; /* Set your desired background color here */
+        }
+    h1 {
+        color: white; 
+        text-align: center;
+}
+      
+    #map {
+    width: 87%;
+    height: 800px;
+    position: relative;
+    margin: 0 auto; /* Centers the map horizontally */
+}
+
+    #slider, #yearSlider {
+        width: 60%; /* Adjust the width as needed */
+        margin: 20px auto; /* Center the slider */
+        height: 20px; /* Make the slider taller for easier interaction */
+        -webkit-appearance: none; /* Override default appearance on WebKit browsers */
+        appearance: none;
+        background: #dddddd00; /* Slider background */
+        outline: none; /* Remove the outline */
+        opacity: 0.7; /* Make the slider slightly transparent */
+        -webkit-transition: .2s; /* Smooth transition */
+        transition: opacity .2s;
+    }
+
+  #yearSlider {
+    width: 100%; /* Full width of its container */
+    height: 9px; /* Slider track height */
+    background: #ddd; /* Track color */
+    outline: none; /* Removes the outline on focus */
+    opacity: 0.7; /* Slightly transparent */
+    -webkit-transition: opacity .2s; /* Smooth transition for hover effect */
+    transition: opacity .2s;
+}
+
+#yearSlider:hover {
+    opacity: 1; /* Fully opaque on hover */
+}
+
+/* Thumb Styles for WebKit */
+#yearSlider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px; /* Width of the thumb */
+    height: 20px; /* Height of the thumb */
+    background: #f9fbf9; /* Thumb color */
+    cursor: pointer; /* Cursor changes to a pointer */
+    border-radius: 50%; /* Circular thumb */
+}
+
+/* Thumb Styles for Firefox */
+#yearSlider::-moz-range-thumb {
+    width: 20px; /* Width of the thumb */
+    height: 20px; /* Height of the thumb */
+    background: #fefefe; /* Thumb color */
+    cursor: pointer; /* Cursor changes to a pointer */
+    border-radius: 50%; /* Circular thumb */
+}
+
+/* Optional: Styles for the focus state */
+#yearSlider:focus {
+    outline: none; /* Removes the outline */
+}
+
+
+    .slider-label, #yearDisplay {
+        font-size: 20px; /* Larger font size for readability */
+        text-align: center;
+        font-weight: bold; /* Make the text bold */
+        color: white
+    }
+
+    #year-display-container {
+    position: absolute; /* Position relative to the map container */
+    top: 5px; /* Distance from the top of the map */
+    right: 15px; /* Distance from the left of the map */
+    z-index: 1000; /* Ensure it appears above the map layers */
+    background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent background for readability */
+    color: #ffffff; /* Text color */
+    padding: 5px 10px; /* Padding around the text */
+    border-radius: 5px; /* Rounded corners */
+    font-size: 20px; /* Larger font size for visibility */
+    font-weight: bold; /* Bold text */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.5); /* Optional: shadow for better visibility */
+}
+
+.slider-title {
+    font-size: 19px; /* Slightly smaller text */
+    color: white; /* Adjust the color as needed */
+    text-align: center;
+    margin-bottom: 0px; /* Reduced space between the title and the slider */
+}
+
+#slider-container {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;          
+    transform: translateX(-50%);
+    z-index: 1000;
+    background: rgba(255, 255, 255, 0);
+    padding: 2px;
+    border-radius: 5px;
+    width: 60%; /* Adjust this for better visibility */
+    text-align: center;
+    height: 10px;
+        }
+
+.legend {
+    position: absolute;
+    bottom: 70px;
+    right: 135px;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 18px;
+    z-index: 1001; /* Ensure it's above other map layers */
+}
+
+.legend h4 {
+    margin: 0 0 5px;
+}
+
+.legend div {
+    margin-bottom: 5px;
+}
+
+.legend-circle {
+    display: inline-block;
+    border-radius: 50%;
+    margin-right: 5px;
+    vertical-align: middle; /* Align the circle vertically with the text */
+}
+
+
+#map-instructions {
+            text-align: center;
+            margin-top: 67px; /* Adjust based on layout */
+            padding: 5px;
+            background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent background for readability */
+            color: #ffffff; /* Text color */
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2); /* Optional: adds subtle shadow for depth */
+            font-size: 16px;
+            position: absolute; /* Position absolute to place it above the map */
+            top: 15px; /* Distance from the top of the map */
+            left: 50%; /* Center horizontally */
+            transform: translateX(-50%);
+            z-index: 1000; /* Ensure it's above the map if overlapping */
+        }
+
+
+</style>
+
+</head>
+<body>
+    <h1>Kruger National Park: Distribution of Rhino Poaching Across Ranger Sections</h1>
+    <div id="map">
+        <div id="year-display-container">Year: <span id="yearDisplay">2013</span></div>
+    </div>
+    <div id="slider-container">
+        <div class="slider-title">Slide to manually change the year</div> <!-- Title for the slider -->
+        <input id="yearSlider" type="range" min="2013" max="2022" value="2013" oninput="updateMap(this.value)" />
+    </div>
+    
+    <!-- Legend is outside #map but can be positioned absolutely if within #map -->
+    <div id="legend" class="legend">
+        <h4>Legend</h4>
+        <div id="combined-legend">
+            <div><span class="legend-circle" style="background-color: #FED976; width: 10px; height: 10px;"></span> 0-20 incidents</div>
+            <div><span class="legend-circle" style="background-color: #FC4E2A; width: 15px; height: 15px;"></span> 21-40 incidents</div>
+            <div><span class="legend-circle" style="background-color: #E31A1C; width: 20px; height: 20px;"></span> 41-60 incidents</div>
+            <div><span class="legend-circle" style="background-color: #800026; width: 25px; height: 25px;"></span> 61+ incidents</div>
+        </div>
+    </div>
+    
+
+    <div id="map-instructions">
+        Click on a marker to see the section name and the number of poaching incidents for the selected year.
+    </div>
+
+
+    <script src="knp_boundaries_shp.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="knpsections.js"></script>
+
+    <script>
+
+    var map = L.map('map').setView([-23.988, 31.554], 8);
+            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+                maxZoom: 19,
+                attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community',
+                ext: 'png'
+            }).addTo(map);
+
+            L.geoJSON(boundaries, {
+                style: function (feature) {
+                    return {color: "#ff7800", weight: 2, opacity: 1};
+                },
+                onEachFeature: function (feature, layer) {
+                    if (feature.properties && feature.properties.Name) {
+                        layer.bindPopup(feature.properties.Name);
+                    }
+                }
+            }).addTo(map);
+
+        function changeSliderYear (currentYear) {
+            var mySlider = document.getElementById('yearSlider')
+            mySlider.value=currentYear
+        }
+
+
+        var startYear = 2013;
+        var currentYear = startYear;
+        var endYear = 2022;
+
+        function updateAnimation() {
+            if (currentYear <= endYear) {
+                updateMap(currentYear); // Update the map to the current year
+                changeSliderYear(currentYear); // Change the slider position to match the current year
+                currentYear++; // Move to the next year
+            } else {
+                // Log for debugging purposes to confirm this part of the code runs
+                console.log("Resetting to start year and stopping the animation.");
+                
+                // Instead of immediately resetting currentYear to startYear, we first clear the interval
+                clearInterval(play);
+
+                // Then, manually call updateMap and changeSliderYear with startYear to ensure UI updates
+                // to reflect the reset without relying on the next interval tick, which will not come.
+                updateMap(startYear);
+                changeSliderYear(startYear);
+
+                // Log the reset for confirmation; this might not be necessary in your final code.
+                console.log("Animation completed and stopped. Current year reset to:", startYear);
+            }
+        }
+
+        var play = setInterval(updateAnimation, 1000);
+
+
+
+
+
+    
+        // Initialize markers object to keep track of the markers
+        var markers = {};
+
+        var markers = L.markerClusterGroup();
+        sections.features.forEach(function(feature) {
+            // Create a marker for each feature
+            var marker = L.marker([feature.properties.lat, feature.properties.lng]);
+            markers.addLayer(marker);
+        });
+        map.addLayer(markers);
+    
+        // Function to update the map based on the selected year
+    function updateMap(selectedYear) {
+    document.getElementById('yearDisplay').innerText = selectedYear; // Update the displayed year
+
+    sections.features.forEach(function(feature) {
+        var incidentsData = feature.properties.PoachingData.find(function(data) {
+            return data.Year == selectedYear;
+        });
+
+        var lat = feature.properties.name_sections_Lat;
+        var lng = feature.properties.name_sections_Long;
+        var name = feature.properties.Name;
+
+        if (markers[name]) {
+            map.removeLayer(markers[name]); // Remove existing marker
+        }
+
+        var baseSize = 5; // Base size of the marker
+        var scalingFactor = 0.5; // Adjust this to change how much the incident count affects the size
+        var markerSize = baseSize + (incidentsData ? incidentsData.Incidents * scalingFactor : 0);
+
+        // Determine color based on poaching amount
+        var fillColor;
+        if (incidentsData) {
+                var incidents = incidentsData.Incidents;
+        if (incidents <= 20) {
+            fillColor = "#FED976"; // Golden Rod for <= 20
+        } else if (incidents > 20 && incidents <= 40) {
+            fillColor = "#FC4E2A"; // Peru for > 20 and <= 40
+        } else if (incidents > 40 && incidents <= 60) {
+            fillColor = "#E31A1C"; // Chocolate for > 40 and <= 60
+        } else if (incidents > 60) {
+        fillColor = "#800026"; // Dark Red for > 60
+    }
+        } else {
+            fillColor = "#CCCCCC"; // Default color if no data
+        }
+
+
+        markers[name] = L.circleMarker([lat, lng], {
+            radius: markerSize,
+            fillColor: fillColor,
+            color: "#000", // Border color
+            weight: 1,
+            opacity: 1,
+            fillOpacity: 0.8
+        }).addTo(map)
+        .bindPopup("<h3>Section: " + name + "</h3><p>Year: " + selectedYear + "<br>Incidents: " + (incidentsData ? incidentsData.Incidents : "0") + "</p>");
+    });
+}
+
+function populateLegend() {
+    var colorLegend = document.getElementById('color-legend');
+    var sizeLegend = document.getElementById('size-legend');
+
+    // Example color categories
+    var colors = [
+        { label: "0-20 incidents", color: "#F7DC6F" },
+        { label: "21-40 incidents", color: "#FC4E2A" },
+        { label: "41-60 incidents", color: "#E31A1C" },
+        { label: "61+ incidents", color: "#800026" }
+    ];
+
+    colors.forEach(function(category) {
+        var item = document.createElement('div');
+        item.innerHTML = `<i style="background: ${category.color}; width: 18px; height: 18px; border-radius: 50%; display: inline-block;"></i> ${category.label}`;
+        colorLegend.appendChild(item);
+    });
+
+    // Example sizes (use representative SVGs or styled divs to illustrate size)
+    var sizes = [
+        { label: "Small (0-20 incidents)", size: "10px" },
+        { label: "Medium (21-40 incidents)", size: "15px" },
+        { label: "Large (41+ incidents)", size: "20px" }
+    ];
+
+    sizes.forEach(function(category) {
+        var item = document.createElement('div');
+        item.style.display = 'flex';
+        item.style.alignItems = 'center';
+        item.innerHTML = `<div style="width: ${category.size}; height: ${category.size}; background: #777; border-radius: 50%; margin-right: 5px;"></div> ${category.label}`;
+        sizeLegend.appendChild(item);
+    });
+}
+
+    populateLegend();
+
+
+   
+        // Initialize the map with the first year
+        updateMap(2013);
+    </script>
+</body>
+</html>

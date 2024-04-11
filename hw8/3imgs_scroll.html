@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Land Cover Change 2012-2022 Lake Norman</title>
+</head>
+<style>
+    .container {
+    position: relative;
+    height: 450px;
+    width: 100%; 
+    }
+
+.container img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 800px;
+    height: auto; 
+    }
+
+.container input[type="range"] {
+    position: absolute;
+    top: 420px;
+    left: 0;
+    width: 43%;
+    height: auto;
+}
+
+</style>
+<h1>
+    Land Cover Change 2012-2022 Lake Norman, NC
+</h1>
+<body>
+    <div class = "container">
+    <img id="second" src="./imgs/2022.png" alt="2022 Land Cover">
+    <img id="first" src="./imgs/2012.png" alt="2012 Land Cover">
+    <input type="range" min="0" max="1" value="0" step=".01" oninput="myFunction(this.value)" />
+
+</div>
+
+<script>
+    var first = document.getElementById('first')
+    var second = document.getElementById('second');
+
+    function myFunction(value){
+        second.style.opacity = value;
+        first.style.opacity = 1 - value;
+    }
+
+</script>
+</body>
+</html>
