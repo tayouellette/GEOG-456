@@ -14,12 +14,53 @@
         text-align: center;
 }
       
-    #map {
+
+
+#map {
     width: 87%;
     height: 800px;
     position: relative;
     margin: 0 auto; /* Centers the map horizontally */
 }
+
+#map-instructions, #legend {
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent background for readability */
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    z-index: 1000; /* Ensure it's above the map */
+}
+
+#map-instructions {
+    top: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    font-size: 16px;
+}
+
+#legend {
+    bottom: 70px;
+    right: 135px;
+    font-size: 18px;
+}
+
+#slider-container {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    z-index: 1000;
+    background: rgba(255, 255, 255, 0);
+    padding: 2px;
+    border-radius: 5px;
+    text-align: center;
+    height: auto;
+}
+
 
     #slider, #yearSlider {
         width: 60%; /* Adjust the width as needed */
@@ -102,19 +143,7 @@
     margin-bottom: 0px; /* Reduced space between the title and the slider */
 }
 
-#slider-container {
-    position: absolute;
-    bottom: 20px;
-    left: 50%;          
-    transform: translateX(-50%);
-    z-index: 1000;
-    background: rgba(255, 255, 255, 0);
-    padding: 2px;
-    border-radius: 5px;
-    width: 60%; /* Adjust this for better visibility */
-    text-align: center;
-    height: 10px;
-        }
+
 
 .legend {
     position: absolute;
@@ -143,22 +172,6 @@
 }
 
 
-#map-instructions {
-            text-align: center;
-            margin-top: 67px; /* Adjust based on layout */
-            padding: 5px;
-            background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent background for readability */
-            color: #ffffff; /* Text color */
-            border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2); /* Optional: adds subtle shadow for depth */
-            font-size: 16px;
-            position: absolute; /* Position absolute to place it above the map */
-            top: 15px; /* Distance from the top of the map */
-            left: 50%; /* Center horizontally */
-            transform: translateX(-50%);
-            z-index: 1000; /* Ensure it's above the map if overlapping */
-        }
-
 
 </style>
 
@@ -167,27 +180,24 @@
     <h1>Kruger National Park: Distribution of Rhino Poaching Across Ranger Sections</h1>
     <div id="map">
         <div id="year-display-container">Year: <span id="yearDisplay">2013</span></div>
-    </div>
-    <div id="slider-container">
-        <div class="slider-title">Slide to manually change the year</div> <!-- Title for the slider -->
-        <input id="yearSlider" type="range" min="2013" max="2022" value="2013" oninput="updateMap(this.value)" />
-    </div>
-    
-    <!-- Legend is outside #map but can be positioned absolutely if within #map -->
-    <div id="legend" class="legend">
-        <h4>Legend</h4>
-        <div id="combined-legend">
-            <div><span class="legend-circle" style="background-color: #FED976; width: 10px; height: 10px;"></span> 0-20 incidents</div>
-            <div><span class="legend-circle" style="background-color: #FC4E2A; width: 15px; height: 15px;"></span> 21-40 incidents</div>
-            <div><span class="legend-circle" style="background-color: #E31A1C; width: 20px; height: 20px;"></span> 41-60 incidents</div>
-            <div><span class="legend-circle" style="background-color: #800026; width: 25px; height: 25px;"></span> 61+ incidents</div>
+        <div id="slider-container">
+            <div class="slider-title">Slide to manually change the year</div>
+            <input id="yearSlider" type="range" min="2013" max="2022" value="2013" oninput="updateMap(this.value)" />
+        </div>
+        <div id="legend" class="legend">
+            <h4>Legend</h4>
+            <div id="combined-legend">
+                <div><span class="legend-circle" style="background-color: #FED976; width: 10px; height: 10px;"></span> 0-20 incidents</div>
+                <div><span class="legend-circle" style="background-color: #FC4E2A; width: 15px; height: 15px;"></span> 21-40 incidents</div>
+                <div><span class="legend-circle" style="background-color: #E31A1C; width: 20px; height: 20px;"></span> 41-60 incidents</div>
+                <div><span class="legend-circle" style="background-color: #800026; width: 25px; height: 25px;"></span> 61+ incidents</div>
+            </div>
+        </div>
+        <div id="map-instructions">
+            Click on a marker to see the section name and the number of poaching incidents for the selected year.
         </div>
     </div>
-    
 
-    <div id="map-instructions">
-        Click on a marker to see the section name and the number of poaching incidents for the selected year.
-    </div>
 
 
     <script src="knp_boundaries_shp.js"></script>
@@ -202,6 +212,19 @@
                 attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community',
                 ext: 'png'
             }).addTo(map);
+
+            // Slider event listeners for enabling and disabling map interactions
+    var yearSlider = L.DomUtil.get('yearSlider');
+    yearSlider.addEventListener('mouseover', function () {
+        map.dragging.disable();
+        map.doubleClickZoom.disable();
+        map.scrollWheelZoom.disable();
+    });
+    yearSlider.addEventListener('mouseout', function () {
+        map.dragging.enable();
+        map.doubleClickZoom.enable();
+        map.scrollWheelZoom.enable();
+    });
 
             L.geoJSON(boundaries, {
                 style: function (feature) {
@@ -247,6 +270,23 @@
         }
 
         var play = setInterval(updateAnimation, 1000);
+
+        // Access the slider element
+var yearSlider = L.DomUtil.get('yearSlider');
+
+// Disable map dragging and zooming when the slider is focused
+yearSlider.addEventListener('mouseover', function () {
+    map.dragging.disable();
+    map.doubleClickZoom.disable();
+    map.scrollWheelZoom.disable();
+});
+
+// Re-enable map dragging and zooming when the slider is not focused
+yearSlider.addEventListener('mouseout', function () {
+    map.dragging.enable();
+    map.doubleClickZoom.enable();
+    map.scrollWheelZoom.enable();
+});
 
 
 

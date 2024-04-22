@@ -1,0 +1,1748 @@
+<head>
+    <meta charset="UTF-8">
+    <title>Exploring the Spatial & Temporal Dimensions of Poaching in Kruger National Park</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Leaflet CSS link -->
+    <!-- JS libraries for animation -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.5.1/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.7/ScrollMagic.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.7/plugins/animation.gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.7/plugins/debug.addIndicators.min.js"></script> <!-- Optional for debugging -->
+    <script src="animation.js"></script>
+
+    <style>
+     html, body {
+            margin: 5px;
+            padding: 0;
+            overflow-x: hidden; /* Ensures there are no horizontal scrollbars */
+
+        }
+
+        .logo 
+        {
+            position: absolute; /* Or 'fixed' if you want it to stay in place on scroll */
+            top: 10px; /* Adjust for padding from the top */
+            right: 24px; /* Adjust for padding from the right */
+            width: 120px; /* Adjust based on your logo's size */
+            height: auto; /* Keeps the aspect ratio */
+                    }
+
+        .map-and-image-container iframe,
+            .map-and-image-container img {
+                flex: 1; /* Allows the map and image to grow and fill the container equally */
+                box-sizing: border-box; /* Includes padding and border in the element's width */
+                margin-right: 20px; /* Adds space between the map and the image */
+
+            }
+
+            .media-item img, .media-item iframe {
+                height: auto; /* Maintains aspect ratio */
+                width: auto;
+            }
+
+            .map-and-image-container {
+            display: flex;
+            justify-content: space-between; /* Adjust this as needed, you can use flex-start for no gap */
+            align-items: flex-start; /* Aligns items at the top */
+        }
+
+        .map-and-image-container iframe, 
+        .map-and-image-container img {
+            flex: 1; /* Allows the map and image to grow and fill the container equally */
+            height: 800px; /* Ensure the height matches between iframe and img */
+            margin-right: 20px; /* Adds space between the map and the image */
+        }
+
+        /* Remove margin-right for the last child (img) to avoid unnecessary space on the right */
+        .map-and-image-container img:last-child {
+            margin-right: 0;
+        }
+
+            @media (max-width: 768px) {
+                .map-and-image-container, .media-content, .media-highlight-section {
+                    flex-direction: column; /* Stacks elements vertically */
+                }
+
+                .media-text, .media-video {
+                    max-width: 100%; /* Each child takes full width */
+                    margin-right: 0; /* Removes any right margin */
+                }
+            }
+
+            .title-background {
+                background-image: url('img/An\ armed\ ranger\ accompanies\ every\ hike\ in\ Kruger.jpg'); /* Ensure correct path */
+                background-size: cover;
+                background-position: center;
+                color: white;
+                text-align: left;
+                padding: 3px 0;
+                min-height: 110vh;  /* Increase the height to 110vh or adjust as needed */
+                width: 100vw;
+                top: 0;
+                left: 0; /* Align to the left edge */
+                right: 0; /* Align to the right edge */
+                z-index: 1000; /* Ensure it's above other content if using sticky */
+            }
+
+            .title {
+                position: absolute;
+            }  
+
+
+/* Drivers of Poaching Media */
+        .images-container {
+            display: flex;
+            justify-content: space-around; /* This spaces out the items evenly */
+            align-items: flex-start; /* Aligns items to the top to start from the same level */
+            flex-wrap: wrap; /* Allows items to wrap onto multiple lines as needed */
+            gap: 20px; /* Space between items */
+            padding: 20px 0; /* Extra padding around the container for better spacing */
+        }
+
+        .media-item {
+            flex-basis: calc(50% - 10px); /* Adjusts the base size of each item subtracting gap */
+            max-width: 50%; /* Controls maximum width to allow for larger display */
+            text-align: center; /* Centers the content, important for images and text alignment */
+            display: flex; /* Makes .media-item a flex container */
+            flex-direction: column; /* Stacks items vertically */
+            align-items: center; /* Aligns children (image, iframe, caption) to the center */
+            margin-bottom: 20px; /* Adds space below each .media-item */
+            position: relative;
+        }
+
+        .highlight-box {
+            position: absolute;
+            top: 33px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 18%;
+            border: 4px solid red; /* Red border for the highlight */
+            display: none; /* Hide by default */
+        }
+
+        .media-item img, .media-item iframe {
+            width: 100%; /* Ensures image/iframes take the full width of their container */
+            height: auto; /* Keeps the aspect ratio intact for images */
+        }
+
+        .image-caption2 {
+            width: 100%; /* Ensures the caption takes full width of .media-item */
+            font-size: 14px; /* Sets font size */
+            color: #666; /* Sets font color */
+            margin-top: 10px; /* Space above the caption */
+            padding: 0 5px; /* Padding on the sides of the caption */
+            box-sizing: border-box; /* Includes padding in the width calculation */
+            text-align: center; /* Ensures text is centered */
+        }
+
+        .media-item {
+                    flex-basis: calc(50% - 10px); /* Adjusts the base size of each item */
+                    max-width: 50%; /* Controls maximum width to allow for larger display */
+                    text-align: center; /* Centers the content */
+                }
+
+        .media-item img {
+            width: 100%; /* Allows the image to fill its container */
+            height: auto; /* Maintains the image's aspect ratio */
+        }
+
+        .media-item iframe {
+            width: 100%; /* Allows the iframe to fill its container, adjusted for larger display */
+            height: 500px; /* Increases height for better visibility */
+            max-width: 100%; /* Ensures iframe responsiveness within its container */
+        }
+
+       
+
+        .image-caption {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+            text-align: center; /* Centers the caption text */
+        }
+
+
+        h1 {
+            font-size: 59px; /* Larger font size */
+            font-weight: bold; /* Bolder font */
+            color: #333; /* Dark grey color */
+            text-align: left; /* Left align */
+            margin-bottom: 5px; /* Adds some space below the title */
+            font-family: 'Arial', sans-serif; /* Common font family */
+            max-width: 45%;
+            position: absolute;
+            
+        }
+
+        /* Style for section headers */
+        h2 {
+            font-size: 32px; /* Large but slightly smaller than the main title */
+            font-weight: 600; /* Bold but less than the main title */
+            color: #555; /* Slightly lighter grey */
+            padding: 10px 0; /* Adds padding above and below */
+            border-bottom: 2px solid #ddd; /* Adds a line below the header */
+            margin-bottom: 20px; /* Adds some space below the header */
+            font-family: 'Arial', sans-serif; /* Maintains consistency in font */
+        }
+
+        /* Style for sub-section headers */
+        h3 {
+            font-size: 25px; /* Adjust size as needed */
+            font-weight: 520; /* Semi-bold for visual hierarchy */
+            color: #666; /* Darker shade for differentiation */
+            margin-bottom: 15px; /* Space below the header for separation */
+            padding: 5px 0; /* Padding above and below the text */
+            border-bottom: 1px solid #eee; /* Subtle bottom border */
+            font-family: 'Arial', sans-serif; /* Consistent font family */
+            text-align: left !important; /* Ensures text is aligned to the left */
+            margin-top: 10px; /* Space above the header */
+        }
+
+        h4 {
+            font-size: 20px; /* Slightly smaller than H3 for hierarchical structure */
+            font-weight: 300; /* Bold to stand out */
+            color: #777; /* Earthy brown, adjusts according to your theme */
+            margin-bottom: 15px; /* Adds some space below the heading */
+            padding-top: 10px; /* Space above the heading */
+            border-bottom: 0.5px solid #eee; /* A subtle earthy line to underscore the title */
+            font-family: 'Arial', sans-serif; /* Consistency with other headings */
+            text-align: left; /* Aligns text to the left */
+        }
+
+        h5 {
+            font-size: 20px; /* Slightly smaller than H3 for hierarchical structure */
+            font-weight: 580; /* Bold to stand out */
+            color: #434343; /* Earthy brown, adjusts according to your theme */
+            margin-bottom: 15px; /* Adds some space below the heading */
+            padding-top: 10px; /* Space above the heading */
+            font-family: 'Arial', sans-serif; /* Consistency with other headings */
+            text-align: center; /* Aligns text to the left */
+        }
+
+
+        p {
+            font-size: 18px; /* Comfortable reading size */
+            line-height: 1.6; /* Enhances readability by increasing space between lines */
+            color: #444; /* A softer color than the headers for better readability */
+            font-family: 'Arial', sans-serif; /* Consistent with the header fonts */
+            margin-bottom: 20px;
+            margin: 5 auto; /* Centers the text block and adds space below each paragraph */
+            text-align: left; /* Justifies the text for a clean look, optional based on preference */
+            margin-bottom: 14px;
+        }
+
+
+        img, video {
+            display: block;
+            margin: 5 auto; /* Centers the element within its container */
+            /* Additional styling */
+        }
+/* Rhino and Elephant Poaching Data Section */
+
+        .data-analysis {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between; /* Ensures proper spacing between items */
+            align-items: flex-start; /* Aligns items to the top */
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        .text-container {
+            flex: 1 1 38%; /* Allows shrinking and growing but starts with 48% of the space */
+            padding-right: 20px; /* Right padding for spacing */
+        }
+        .graph-container {
+            flex: 1 1 60%; /* Adjusting for flexible basis but ensuring it doesn't shrink below 48% */
+            margin-top: 40px;
+            padding: 0; /* Remove padding to maximize available space for the graph */
+            box-sizing: border-box;
+            overflow: visible; /* Ensures nothing is hidden */
+        }
+
+        .graph-container iframe, .graph-container2 iframe {
+            width: 100%; /* Ensures iframe takes up the full width of its container */
+            height: 650px; /* Increase height to accommodate full graph display */
+            border: none;
+            opacity: 1; /* Ensures the iframe is fully visible */
+            transition: none; /* Disables any transition effects that might interfere with visibility */
+        }
+
+        .graph-container2 {
+            flex: 1 1 60%; /* Adjusting for flexible basis but ensuring it doesn't shrink below 48% */
+            margin-top: 80px;
+            margin-left: 0%;
+            margin-right: 63px;
+            padding: 0; /* Remove padding to maximize available space for the graph */
+            box-sizing: border-box;
+            overflow: visible; /* Ensures nothing is hidden */
+        }
+
+        .text-container2 {
+            flex: 1 1 36%; /* Allows shrinking and growing but starts with 48% of the space */
+            margin-top: 20px;
+           
+        }
+
+        .graph-caption {
+            font-size: 14px;
+            color: #666;
+            text-align: center;
+            width: 100%; /* Ensures caption is aligned with the graph width */
+        }
+
+        #rhinoPoachingImpact {
+            opacity: 0; /* Start invisible */
+            transform: translateY(50px); /* Start slightly lower */
+            transition: all 0.5s ease-out; /* Smooth transition for the toggle */
+        }
+
+        #rhinoPoachingImpact.visible {
+            opacity: 1; /* Fully visible */
+            transform: translateY(0); /* Move to original position */
+        }
+
+        #rhinoPoachingImpact.visible .graph-container iframe {
+            opacity: 1; /* Fade in to full visibility */
+            transform: scale(1); /* Scale back to normal */
+        }
+
+/* 1946 Leaflet Map */
+        #map {
+    width: 90%;
+    height: 800px;
+    position: relative;
+    margin: 0 auto; /* Centers the map horizontally */
+}
+    .custom-popup .leaflet-popup-content { 
+        font-size: 16px; /* Adjust font size as needed */
+    }
+
+    .legend {
+    position: absolute;
+    bottom: 20px;
+    right: 10px;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 18px;
+    z-index: 1001; /* Ensure it's above other map layers */
+    }
+
+    .legend h4 {
+        margin: 0 0 5px;
+    }
+
+    .legend div {
+        margin-bottom: 5px;
+    }
+
+    .legend-circle {
+        display: inline-block;
+        border-radius: 50%;
+        margin-right: 5px;
+        vertical-align: middle; /* Align the circle vertically with the text */
+    }
+
+    #map-instructions {
+            text-align: center;
+            margin-top: 2px; /* Adjust based on layout */
+            padding: 5px;
+            background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent background for readability */
+            color: #ffffff; /* Text color */
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2); /* Optional: adds subtle shadow for depth */
+            font-size: 15px;
+            position: absolute; /* Position absolute to place it above the map */
+            top: 15px; /* Distance from the top of the map */
+            left: 50%; /* Center horizontally */
+            transform: translateX(-50%);
+            z-index: 1000; /* Ensure it's above the map if overlapping */
+        }
+
+/* 2013-2022 Leaflet Map */
+
+.fullscreen-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;    /* Removes the border */
+    padding: 0;      /* No padding */
+    margin: 0;       /* No margins */
+    display: block;  /* Prevents inline gaps */
+    position: absolute; /* Optional: Makes it absolutely positioned within a relative container */
+}
+
+.containerleaf {
+    width: 100%;
+    height: 100vh;   /* 100% of the viewport height */
+    position: relative; /* Needed if iframe is absolute */
+    overflow: hidden; /* Ensures no scrollbars are visible */
+}
+
+
+
+
+/* Media Section */
+        .media-highlight-section {
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start; /* Aligns items to the top */
+            justify-content: space-between; /* Creates space between text/video and image */
+        }
+
+        .media-content {
+            display: flex;
+            justify-content: flex-start; /* Align children (text and image) to the start */
+            align-items: flex-start; /* Align items to the top */
+            width: 100%; /* Use the full width to accommodate the text and image side by side */
+        }
+
+        .media-text-video-container {
+            flex-grow: 2; /* Allows text and video container to take more space */
+            margin-right: 20px; /* Adds some space between this container and the image */
+        }
+
+        .media-text {
+            flex: 1; /* Allows the text container to grow and fill the space */
+            margin-right: 20px; /* Adjust this value to control the space between the text and the image */
+        }
+
+        .media-video {
+            width: 640px; /* Set the width of the video container */
+            margin-top: 20px; /* Space above the video */
+            margin-left: 110px; /* Align the video container as needed */
+            margin-bottom: 10px; /* Space below the video before the caption */
+        }
+
+        .media-video iframe {
+            width: 100%; /* The iframe takes the full width of its container */
+            height: 360px; /* Explicitly set the height to maintain aspect ratio */
+        }
+
+        .video-caption {
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+            width: 640px; /* Match the width of the video for direct alignment */
+            margin-top: 0; /* Remove any additional top margin to keep the caption close */
+        }
+
+        .media-image {
+            flex-basis: 30%; /* Adjust this percentage based on the desired width of the image */
+            margin-top: 80px;
+        }
+    
+        .media-below-video {
+            display: block; /* Ensures the image is block-level to allow margin specifications */
+            max-width: 100%; /* Makes sure the image is responsive and does not overflow its container */
+            height: auto; /* Maintains the aspect ratio of the image */
+            margin: 20px auto; /* Adds space above and below the image, and centers it horizontally */
+        }
+
+/* Antipoaching Images */
+        .antipoaching-images {
+                width: 100%; /* Adjust based on your layout needs */
+                position: relative;
+                margin-top: 30px; /* Space above the slideshow */
+                margin-bottom: 30px; /* Space below the slideshow */
+                text-align: center; /* Centers the buttons */
+            }
+
+            .image-caption-container {
+                display: none; /* Keeps non-active slides hidden */
+                position: relative; /* Updated to relative */
+                width: 100%; /* Takes full width of its container */
+            }
+
+            .image-caption-container.active {
+                display: block; /* Shows the active slide */
+            }
+
+            .image-caption-container img {
+                width: auto; /* Ensures image takes full width of the container */
+                height: auto; /* Maintains aspect ratio */
+                max-height: 500px; /* Maximum height for all images */
+                object-fit: cover; /* Ensures the image covers the area without distortion */
+            }
+
+            .image-caption {
+                position: absolute;
+                bottom: 0;
+                left: 50%; /* Position horizontally in the center */
+                transform: translateX(-50%); /* Center align the caption */
+                background: rgba(0, 0, 0, 0.7);
+                color: white;
+                padding: 5px 10px;
+                border-radius: 5px; /* Optional: adds rounded corners to the caption */
+                max-width: 80%; /* Maximum width of the caption */
+                text-align: center;
+            }
+
+    /* Container for navigation buttons */
+            .nav-buttons {
+                display: inline-block; /* Places buttons side by side */
+                padding: 10px;
+                margin-top: 10px; /* Space above the button row */
+            }
+
+            button {
+                margin-right: 5px; /* Space between buttons */
+                padding: 8px 16px; /* Padding inside buttons */
+                background-color: #000; /* Button background color */
+                color: #fff; /* Button text color */
+                border: none; /* No borders */
+                cursor: pointer; /* Pointer cursor on hover */
+            }
+
+            button:last-child {
+                margin-right: 0; /* Removes margin from the last button */
+            }
+
+            .image-caption a {
+                color: white; /* Sets the link color to white */
+                text-decoration: underline; /* Underlines the link to indicate clickability */
+            }
+
+            .image-caption a:hover, .image-caption a:focus {
+                color: #ccc; /* Light gray color for hover and focus states to provide feedback */
+                text-decoration: none; /* Optional: removes the underline on hover/focus for a different effect */
+            }
+
+    /* Style for fullscreen mode */
+            :fullscreen {
+                width: 100vw; /* full width of the viewport */
+                height: 100vh; /* full height of the viewport */
+                display: flex;
+                align-items: center; /* Center images vertically */
+                justify-content: center; /* Center images horizontally */
+                background-color: black; /* Optional: Adds a black background for better viewing */
+            }
+
+            :fullscreen .image-caption-container {
+                display: block; /* Ensures all images are displayed in full-screen mode */
+                width: auto; /* Auto width for responsiveness */
+                max-width: 100%; /* Ensures image does not exceed the screen width */
+                height: auto; /* Auto height for responsiveness */
+                max-height: 90vh; /* Limits the image height to 90% of the viewport height */
+            }
+
+            :fullscreen .image-caption-container img {
+                max-width: 100%; /* Full width within the container constraints */
+                max-height: 90vh; /* Full height within the container constraints */
+                object-fit: contain; /* Ensures that the aspect ratio is maintained */
+            }
+
+
+                        @media (max-width: 768px) {
+                            .image-caption-container img {
+                                max-height: 300px; /* Smaller height for smaller screens */
+                            }
+                        }
+    /* Poaching Arrests and Fatalities Chart */
+            .arrestsdeathschart {
+                display: flex; /* Enables flexbox */
+                flex-direction: column; /* Stack children vertically */
+                align-items: center; /* Center children horizontally */
+                justify-content: center; /* Center children vertically */
+                margin: 120px 0; /* Adds vertical margin for spacing */
+                padding: 20px; /* Padding around the iframe */
+                box-shadow: 4px 15px 20px rgba(0,0,0,0.1); /* Optional: adds shadow for better focus */
+                background-color: #ffffff; /* Background color for the chart container */
+                transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+                transform: scale(0.95); /* Start slightly scaled down */
+                opacity: 0.7; /* Start slightly transparent */
+            }
+
+        iframe {
+            width: 100%; /* Use full width of the container */
+            max-width: 1099px; /* Maximum width of the iframe */
+            height: 681px; /* Height of the iframe */
+            border: none; /* Remove default border */
+        }
+
+
+        .arrestsdeathschart.in-focus {
+            transform: scale(1.15); /* Scale to normal size when in focus */
+            opacity: 1; /* Full opacity when in focus */
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2); /* Stronger shadow for emphasis */
+        }
+/* Trafficking Data */
+        .traffic-section-header {
+            text-align: left !important;  /* Aligns the text of the header to the left */
+        }
+
+        .traffic {
+            display: flex;
+            flex-direction: column; /* Changed to column for better vertical alignment */
+            width: 100%; /* Ensures container takes full width */
+            padding: 20px; /* Uniform padding */
+            box-sizing: border-box; /* Includes padding in the width calculation */
+        }
+        
+
+        .graphs-container {
+            display: flex;
+            justify-content: space-evenly; /* Even spacing on all sides */
+            flex-wrap: wrap; /* Allows items to wrap on smaller screens */
+            width: 100%; /* Full width */
+            margin: 0 auto; /* Centering the container */
+        }
+
+        .graph-item {
+            flex: 1 1 48%; /* Takes up roughly half of the container width */
+            box-sizing: border-box; /* Border and padding are included in the width */
+            padding: 10px; /* Padding around each graph */
+            margin-bottom: 20px; /* Space below each graph */
+        }
+
+        .graph-item iframe {
+            width: 100%; /* Full width of parent container */
+            height: 550px; /* Standard height, adjust if needed for content visibility */
+            border: none; /* Removes any border */
+        }
+
+        .graph-caption {
+            text-align: center; /* Centers the caption text */
+            font-size: 14px;
+            color: #666;
+            padding-top: 10px; /* Space above caption */
+            width: 100%; /* Ensures the caption is as wide as the iframe */
+        }
+
+        .graph-title {
+            text-align: center;  /* Centers the title text */
+        }
+
+        .hornseizureschart {
+                display: flex; /* Enables flexbox */
+                flex-direction: column; /* Stack children vertically */
+                align-items: center; /* Center children horizontally */
+                justify-content: center; /* Center children vertically */
+                margin: 80px 0; /* Adds vertical margin for spacing */
+                padding: 20px; /* Padding around the iframe */
+                box-shadow: 4px 15px 20px rgba(0,0,0,0.1); /* Optional: adds shadow for better focus */
+                background-color: #ffffff; /* Background color for the chart container */
+                transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+                transform: scale(0.95); /* Start slightly scaled down */
+                opacity: 0.7; /* Start slightly transparent */
+            }
+
+        iframe {
+            width: 100%; /* Use full width of the container */
+            max-width: 1099px; /* Maximum width of the iframe */
+            height: 681px; /* Height of the iframe */
+            border: none; /* Remove default border */
+        }
+
+
+        .hornseizureschart.in-focus {
+            transform: scale(1.25); /* Scale to normal size when in focus */
+            opacity: 1; /* Full opacity when in focus */
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2); /* Stronger shadow for emphasis */
+        }
+
+        @media (max-width: 768px) {
+            .graph-item {
+                width: 100%; /* Stacks the graphs on smaller screens */
+                padding: 0 10px; /* Maintains padding for consistency */
+            }
+        }
+
+/* Colonial legacies section */
+    .coloniallegaciesintro {
+        margin-bottom: 15px;
+    }
+
+    .zoom-effect {
+    cursor: pointer;
+    display: block;
+    margin: auto; /* Center the image */
+}
+
+    .image-caption3 {
+            width: 100%; /* Ensures the caption takes full width of .media-item */
+            font-size: 14px; /* Sets font size */
+            color: #666; /* Sets font color */
+            margin-top: 10px; /* Space above the caption */
+            padding: 0 5px; /* Padding on the sides of the caption */
+            box-sizing: border-box; /* Includes padding in the width calculation */
+            text-align: center; /* Ensures text is centered */
+        }
+
+        .colonialimage-container {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .left-image, .right-image {
+            position: relative;
+            width: 43%;
+        }
+        .right-image {
+    position: relative;
+    width: 43%; /* Adjust this as needed to fit your design */
+    height: 800px; /* Set to the maximum height of your images or as needed */
+    overflow: hidden; /* This will hide any overflow if images are smaller than the container */
+}
+
+.right-image img {
+    width: 100%; /* Images will fill the width of the container */
+    display: none; /* Hide all images initially */
+}
+
+.right-image img.active {
+    display: block; /* Display the active image */
+}
+
+.right-image .caption {
+    text-align: center;
+    display: none; /* Hide all captions initially */
+    font-style: italic;
+    color: #666;
+    padding: 10px 0; /* Padding for aesthetics */
+}
+
+.right-image .active + .caption {
+    display: block; /* Display the caption of the active image */
+}
+
+.button {
+    position: absolute;
+    top: 4px; /* Adjust to space above the bottom of the container */  
+    right: 0px;
+    transform: translateX(-50%); /* Center the button horizontally */
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+@media (max-width: 768px) {
+    .right-image {
+        height: 400px; /* Example: shorter height for smaller screens */
+    }
+}
+        
+/* CSS for comparative window of archival maps */
+* {box-sizing: border-box;}
+
+.img-comp-container {
+    position: relative;
+    width: 400px;  /* Adjust width as needed */
+    height: 800px; /* Adjust height as needed */
+    margin: 0 auto; /* Center the container horizontally on the page */
+    overflow: hidden; /* Ensures no part of the images spills outside the container */
+    margin-bottom: 40px;
+}
+
+.img-comp-img, .img-comp-overlay {
+    position: absolute;
+  width: auto;
+  height: auto;
+  overflow:hidden;
+}
+
+.img-comp-img img, .img-comp-overlay img {
+    display: block;
+    vertical-align: middle;
+    
+}
+
+.img-comp-slider {
+   position: absolute;
+  z-index:9;
+  cursor: ew-resize;
+  /*set the appearance of the slider:*/
+  width: 40px;
+  height: 40px;
+  background-color: #0a5e18;
+  opacity: 0.7;
+  border-radius: 50%;
+}
+
+h6 {
+    text-align: center;
+}
+
+
+
+/* Archival Excerpts */
+.container5 {
+    font-family: 'Times New Roman', serif;
+    height: 98%;
+    width: 98%;
+    padding: 1%; /* Ensures that there's a little padding and doesn't touch the edges */
+    box-sizing: border-box; /* Includes padding and border in the element's total width and height */
+    margin-top: 100px;
+}
+
+.step {
+    height: 80vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column; /* Stack children vertically */
+    justify-content: center; /* Center vertically */
+    align-items: center; /* Center horizontally */
+    text-align: center;
+    color: #333;
+    transition: transform 0.5s ease-in-out;
+    opacity: 0.5;
+    margin: 0 auto; /* Auto margins for horizontal centering */
+    overflow: hidden; /* Prevents content from overflowing */
+    word-wrap: break-word; /* Ensures words do not break the layout */
+    padding: 20px; /* Adds space inside the boxes around the content */
+    box-sizing: border-box; /* Includes padding in the box's size calculation */
+}
+
+
+blockquote {
+    font-size: 2rem;
+    font-style: italic;
+    text-align: center;
+    width: 100%; /* Ensures the blockquote takes up the full width of .step */
+    max-width: 600px; /* Optional: Limits the width for readability */
+    margin: 0 auto; /* Center the blockquote if its width is less than 100% of .step */
+    word-wrap: break-word; /* Wrap text to prevent horizontal scrolling */
+    margin-bottom: 5px;
+}
+
+blockquotetitle {
+    font-size: 2rem;
+    font-style: normal;
+    text-align: center;
+    width: 100%; /* Ensures the blockquote takes up the full width of .step */
+    max-width: 700px; /* Optional: Limits the width for readability */
+    margin: 0 auto; /* Center the blockquote if its width is less than 100% of .step */
+    word-wrap: break-word; /* Wrap text to prevent horizontal scrolling */
+    margin-bottom: 5px;
+}
+
+
+cite {
+    font-size: small;
+    margin-top: 1em;
+    width: 70%; /* Full width to maintain consistency */
+    text-align: center; /* Ensures citation is centered under the blockquote */
+}
+
+.step-active {
+    transform: scale(1.1);
+    opacity: 1;
+}
+
+.archiveimg {
+    margin-top: 80px;
+}
+
+      
+    </style>
+</head>
+
+<body>
+    
+<article>
+    <header>
+        <header class="title-background">
+            <h1>Exploring the Spatial & Temporal Dimensions of Poaching in Kruger National Park
+                <p>Taylor Ouellette, Environment, Ecology, Energy Program, The University of North Carolina at Chapel Hill</p></h1>
+        <!-- Date can be dynamically inserted using JavaScript -->
+        <p id="date"></p>
+        </header>
+
+    </header>
+
+    <img src="img/unclogo.png" alt="Your Logo" class="logo">
+
+    <section>
+        <h2>Kruger National Park: A Global Rhino Poaching Hotspot</h2>
+        <p>Approximately <strong>15%</strong> of the Earth's land surface is designated as protected. A prime example is <strong>Kruger National Park (KNP)</strong>, one of Africa's largest protected areas, located in the northeastern corner of South Africa, bordering Mozambique and Zimbabwe.
+            It's celebrated for its rich diversity of wildlife, including the Big Five (lion, elephant, buffalo, leopard, and rhinoceros), and is known for its varied ecosystems from savannas to woodlands, making it a key site for conservation efforts.
+            
+            However, being home to the largest population of rhinos globally, it is also the <strong>largest rhino poaching hotspot</strong>, serving as an important and ongoing threat to conservation efforts in KNP.
+        </p>
+        <p>
+            Poaching, defined as the illegal hunting, capturing, and usually killing of wildlife, threatens biodiversity, disrupts ecosystems, and impedes conservation initiatives. 
+            In KNP, this practice is primarily fueled by the international demand for rhino horns, compounded by severe economic disparities. These illegal activities not only put 
+            additional pressure on the populations of these endangered species but also offer significant financial incentives to those involved, 
+            further complicating efforts to protect wildlife and conserve natural habitats, while pointing to the need for anti-poaching measures to factor in the socioeconomic drivers.
+        </p>
+        <div class="map-and-image-container">
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2056859.528181787!2d31.491657749354548!3d-23.77598293178736!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1ec34896c535a0a1%3A0x9a504ed31f67787b!2sKruger%20National%20Park!5e1!3m2!1sen!2sus!4v1711057377852!5m2!1sen!2sus" 
+            width="800" height="620" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            <img src="img/KNP_GE.png" alt="Map of Kruger" style="width: 400px; height:800px;">
+        </div>
+        
+    </section>
+
+     <!-- Rhino Poaching Analysis Section -->
+
+    <section>
+        <section id="rhinoPoachingImpact" class="data-analysis">
+        <section class="data-analysis">
+            <div class="text-container">
+        <h3>The Impact of Rhino Poaching on Population</h3>
+        <p>This graph presents a detailed analysis of rhino poaching and population trends within Kruger National Park over the last decade. Data utilized in this analysis were sourced from the South African National Parks Annual Reports, supplemented by archived reports and media releases from the South African Department of Forestry, Fisheries, and the Environment. Compiled using Google Sheets, the visual representation highlights the relationship between poaching activities and the rhino population within the park.</p>
+
+            <p>This analysis reveals that poaching has been a significant factor in the decline of the rhino population throughout the years. It also points out an interesting dynamic: as the rhino population within the park decreased, the frequency of poaching incidents followed a similar downward trajectory. This pattern can likely be attributed to the dwindling number of available rhinos to poach, combined with the implementation of increasingly aggressive anti-poaching measures within the park. A notable strategy has been the <strong>dehorning of approximately 70% of rhinos</strong> within KNP by the end of 2022, aimed at making them less attractive targets for poachers.</p>
+            
+            <p>Beyond poaching, additional factors behind the declining rhino numbers in Kruger, include natural mortality and the strategic relocation of rhinos. These relocations, whether natural or orchestrated by conservation authorities, are part of efforts to transfer rhinos to areas with lower poaching risks.</p>
+        </div>
+        <div class="graph-container">
+            <iframe width="1006" height="620" seamless frameborder="0" scrolling="no" 
+            src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTDeJykclL9yAy0a_p5qBwpbVstFS84W2BTsPaBIF3WBd0IgCSDuEuP8QYc3ujQJh8avdfptDweAfpd/pubchart?oid=1657187847&amp;format=interactive">
+        </iframe>
+        <p class="graph-caption">Data sourced from South African National Parks Annual Reports and other official releases. <strong>Note there are two scales on the vertical axes.</strong></p>
+     </div>
+    </section>
+</section>
+    
+     <!-- Elephant Poaching Analysis Section -->
+    <section>
+     <section class="data-analysis">
+        <div class="graph-container2">
+            <!-- Graph 2 for Elephant Data -->
+            <iframe width="1006" height="620" seamless frameborder="0" scrolling="no" 
+            src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTDeJykclL9yAy0a_p5qBwpbVstFS84W2BTsPaBIF3WBd0IgCSDuEuP8QYc3ujQJh8avdfptDweAfpd/pubchart?oid=637839568&amp;format=interactive">
+
+            </iframe>
+            <p class="graph-caption">Data for this graph were compiled from SANParks' Annual Reports, Africa Geographic, and National Geographic. For certain years, population figures are estimated based on average growth rates. <strong>Note there are two scales on the vertical axes.</strong></p>
+        </div>
+
+        <div class="text-container2">
+            <h3>Elephant Poaching: A Less Significant Threat to Population</h3>
+            <p>
+                As opposed to the pressing issue of rhino poaching, elephant poaching in KNP has not been as significant, 
+                despite the park hosting a considerable elephant population and the high market value and demand for ivory globally. 
+            </p>
+            <p>
+                The history of elephants in KNP is a testament to conservation successes and challenges alike. 
+                In 1903, no elephants roamed the area of today's park, but by the establishment of the Sabie Game Reserve in 1923 — the precursor of KNP — approximately 100 elephants had migrated from Mozambique. 
+                Over the decades, this number surged, driven by natural growth and further migrations, necessitating management interventions. By 1965, the population reached 7,000, and by 1970, it had grown to 8,821. 
+                Concerns over ecological balance and the impacts of an unchecked elephant 
+                population led to a culling campaign between 1967 and 1995, during which about <strong>500 elephants were culled</strong> and 2,500 relocated. Despite these efforts, the population's growth rate did not wane significantly, illustrating the species' robust reproductive capacity. 
+                By 2003, the population was recorded at 13,566, and this upward trend has continued, with the population growing at an estimated annual average of 4%, nearing 30,000 by 2023.
+            </p>
+            <p>     
+            The graph below illustrates the trajectory of Kruger's elephant population alongside annual poaching figures. In  contrast to rhinos, the elephant population within KNP has largely remained unaffected in the face of poaching pressures.
+                
+                For further details, visit Koehl's Elephant Encyclopedia online [Koehl, D. (2024). Kruger National Park, Elephant Encyclopedia. Available at: <a href="https://www.elephant.se/location2.php?location_id=38" target="_blank">Elephant Encyclopedia</a>.
+            </p>
+        </section>
+
+        <script>
+            window.addEventListener('load', function() {
+            const iframes = document.querySelectorAll('.graph-container iframe, .graph-container2 iframe');
+            iframes.forEach(iframe => {
+                iframe.onload = function() {
+                    setTimeout(() => {
+                        try {
+                            const body = iframe.contentWindow.document.body;
+                            const height = body.scrollHeight;
+                            iframe.style.height = `${height}px`;
+                        } catch (error) {
+                            console.error("Error resizing iframe:", error);
+                        }
+                    }, 500); // Adjust timing as necessary
+                };
+            });
+        });
+        </script>
+
+    <!-- 1943 Leaflet Map -->
+
+        <section>
+            <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+            <script src = "1946_knpsections_poach.js"></script> 
+        <h3>
+            Spatial Dynamics of Poaching Over Time </h3>
+            <div id="map">
+            <!-- Your existing HTML for legend and other elements -->
+
+            <div id="legend" class="legend">
+                <h4>Legend</h4>
+                <div id="combined-legend">
+                    <div><span class="legend-circle" style="background-color: #FED976; width: 10px; height: 10px;"></span> low poaching</div>
+                    <div><span class="legend-circle" style="background-color: #FC4E2A; width: 15px; height: 15px;"></span> moderate poaching</div>
+                    <div><span class="legend-circle" style="background-color: #800026; width: 25px; height: 25px;"></span> high poaching</div>
+                </div>
+            </div>
+
+            <div id="map-instructions">
+                Select a marker to view details about the section, including the responsible ranger and insights into threats as evaluated in the Warden's Grading of Sections Report.
+            </div>
+        </div>
+
+            <script>
+
+                
+            var map = L.map('map').setView([-23.988, 31.554], 8.45);
+            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+                attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012'
+            }).addTo(map);
+
+            sections.features.forEach(function(feature) {
+                var lat = feature.properties.name_sections_Lat;
+                var lng = feature.properties.name_sections_Long;
+                var name = feature.properties.Name;
+                var poachingData1946 = feature.properties.PoachingData.find(function(data) {
+                    return data.Year === 1946;
+                });
+                var incidents = poachingData1946 ? poachingData1946.Incidents : 0; // Default to 0 if no data for 1946
+                var rangerQuote = feature.properties.RangerQuote;
+                var rangerName = feature.properties.RangerName;
+
+            // Determine fillColor based on the number of incidents
+            var fillColor;
+            if (incidents <= 10) {
+                fillColor = "#FED976"; // Golden Rod
+            } else if (incidents > 10 && incidents <= 20) {
+                fillColor = "#FC4E2A"; // Peru
+            } else if (incidents > 20) {
+                fillColor = "#800026"; // Dark Red
+            } else {
+                fillColor = "#CCCCCC"; // Default color if no data
+            }
+
+            // Marker size reflects intensity of poaching
+            var baseSize = 5; // Base size for markers
+            var scalingFactor = 1; // Adjust scaling factor to influence how much the incident count affects size
+            var markerSize = baseSize + (incidents * scalingFactor); // Calculate dynamic marker size
+
+            // Create a circle marker for this section with dynamic radius based on incidents
+            var marker = L.circleMarker([lat, lng], {
+                color: '#000',
+                weight: 1,
+                fillColor: fillColor,
+                fillOpacity: 0.8,
+                radius: markerSize // Use dynamic size for radius
+            }).addTo(map);   
+
+            // Bind a popup with information about the section
+            marker.bindPopup(`<h3>Section: ${name}</h3><p>Ranger: ${rangerName}</p><p>Quote: "${rangerQuote}"</p>`);
+        });
+
+        function populateLegend() {
+            var colorLegend = document.getElementById('color-legend');
+            var sizeLegend = document.getElementById('size-legend');
+
+            // Example color categories
+            var colors = [
+                { label: "0-20 incidents", color: "#F7DC6F" },
+                { label: "21-40 incidents", color: "#FC4E2A" },
+                { label: "61+ incidents", color: "#800026" }
+            ];
+
+            colors.forEach(function(category) {
+                var item = document.createElement('div');
+                item.innerHTML = `<i style="background: ${category.color}; width: 18px; height: 18px; border-radius: 50%; display: inline-block;"></i> ${category.label}`;
+                colorLegend.appendChild(item);
+            });
+
+        // Example sizes (use representative SVGs or styled divs to illustrate size)
+            var sizes = [
+                { label: "Small (0-20 incidents)", size: "10px" },
+                { label: "Medium (21-40 incidents)", size: "15px" },
+                { label: "Large (41+ incidents)", size: "20px" }
+            ];
+
+            sizes.forEach(function(category) {
+                var item = document.createElement('div');
+                item.style.display = 'flex';
+                item.style.alignItems = 'center';
+                item.innerHTML = `<div style="width: ${category.size}; height: ${category.size}; background: #777; border-radius: 50%; margin-right: 5px;"></div> ${category.label}`;
+                sizeLegend.appendChild(item);
+            });
+        }
+
+        populateLegend();
+
+            </script>
+</section>
+<section> 
+    <h3>2013-2022 Kruger National Park Poaching Analysis</h3>
+    <div class="containerleaf">
+        <iframe src="https://tayouellette.github.io/GEOG-456/hw7/2013_2022_knpsections_slider.html" class="fullscreen-iframe"></iframe>
+    </div>
+    
+</section>
+
+
+ 
+   <!--Media Attention Section-->
+   <section class="media-section">
+    <section class="media-highlight-section">
+        <div class="media-content">
+            <div class="media-text-video-container">
+                <div class="media-text">
+                    <h3>Rhino Poaching in Kruger: Global Media Spotlight</h3>
+                    <p>The graph titled 'Annual Rhino Population and Rhinos Poached' starkly illustrates the significant decline in the rhino population within KNP over recent years, identifying poaching as an important contributing factor.
+                        This alarming trend has captured the attention of international conservation organizations and media, prompting widespread calls for urgent measures to protect the remaining rhinos and put a stop to the poaching crisis. 
+                        The National Geographic headline on the right, alongside the ABC News article below, offer insight into how this pressing issue continues to be framed within the media.</p>
+                       
+                       <p>Conservation groups such as <a href="https://www.savetherhino.org/">Save the Rhino International</a>, <a href="https://rhinos.org/">International Rhino Foundation</a>, and <a href="https://spearnpo.co.za/">Stop Poaching Endangered African Rhinos (SPEAR)</a>,
+                        have also emerged, dedicating their resources to preserving rhino populations in KNP, throughout South Africa, and across the African continent. Their strategies include community engagement, awareness and educational campaigns, and fundraising for anti-poaching initiatives.
+                       </p>
+
+                       <p>These examples collectively highlight the extensive attention and concerted efforts aimed at addressing the issue of poaching within KNP.</p>
+                </div>
+
+                <div class="media-video">
+                    <iframe width="640" height="360" src="https://abcnews.go.com/video/embed?id=84311669" allowfullscreen frameborder="0"></iframe>
+                    <p class = "video-caption">News clip from ABC News article, "Rhino poaching on the rise in South Africa, new figures show," published February 28, 2024 by Emma Ogao and Liezl Thom.
+                Video caption reads "National park in South Africa addresses rhino poaching problem. At Kruger National Park in South Africa, rhino numbers have decreased by a staggering 80%, but new "miracle" baby rhinos are giving conservationists hope."
+            </p>
+
+                </div>
+            </div>
+            
+            <div class="media-image">
+                <a href="https://www.nationalgeographic.com/animals/article/rhino-numbers-drop-kruger-national-park/" target="_blank">
+                    <img src="img/NatGeo Article.png" alt="National Geographic Article">
+                    <div class="popup">Click on the image or here to see the full article</div>
+                </a>
+             </div>
+         </section>
+
+
+
+    <h2>
+        Militarized Anti-Poaching Measures
+    </h2>
+        <p>
+            The intensification of poaching within KNP has not only garnered substantial media coverage but also prompted South African National Parks (SANParks), the governing body of KNP, to adopt increasingly militarized anti-poaching strategies. 
+            This shift towards what Lunstrum (2014) terms "green militarization" reflects a growing trend in conservation efforts globally.
+            Green militarization is characterized by the employment of military and paramilitary personnel, technologies, training, and partnerships to bolster conservation initiatives.
+        </p>
+        <p>
+            In KNP, such militarized conservation methods include the deployment of armed anti-poaching units, extensive patrols, paramilitary conservation personnel, and sophisticated 
+            surveillance technology, including drones, helicopters, remote sensing, and Geographic Information Systems (GIS). 
+            Notably, entities like the South African National Defence Force (SANDF) and <a href=https://rhino-force.org/projects.html>Hemmersbach Rhino Force</a> have been instrumental in these efforts.
+        </p> 
+        <p> 
+            Historically, during the apartheid era, the SANDF was deployed within KNP to secure the border against the movement of anti-apartheid activists and Mozambican refugees, 
+            involving the construction of military bases and electrification of certain border segments. Post-apartheid, the SANDF's involvement in anti-poaching operations within the
+             park has served as a means of justifying its continued existence, 
+            highlighting a broader trend of intertwining military presence with conservation practices beyond South Africa's borders, as noted by Lunstrum (2014).
+        </p> 
+        <p>
+            The Hemmersbach Rhino Force further exemplifies this approach by safeguarding KNP's western border from poaching syndicates. This paramilitary group utilizes sniffer dogs, patrols the park perimeter with military-grade surveillance equipment, 
+            detains unauthorized entrants, supports law enforcement operations, and assists in crisis situations like social unrest or combating illegal activities within the park.
+        </p>
+       
+        <div class="antipoaching-images">
+            <!-- Additional images below in 2x2 layout or as needed -->
+            <!-- Each image-caption-container holds an image and a caption -->
+            <div class="image-caption-container">
+              <img src="img/militarized_antipoaching_rhino_force.jpg" alt="Militarized Anti-Poaching Rhino Force">
+              <p class="image-caption">Image: <a href="https://rhino-force.org/projects.html" target="_blank">Hemmersbach Rhino Force</a> Squad.</p>
+            </div>
+            <div class="image-caption-container">
+              <img src="img/hemmer_rhino_force.jpg" alt="Hemmer Rhino Force">
+              <p class="image-caption">Image: <a href="https://rhino-force.org/projects.html" target="_blank">Hemmersbach Rhino Force</a> in the Field Patrolling.</p>
+            </div>
+            <div class="image-caption-container">
+                <img src="img/Black Mambas.jpg" alt="Black Mambas">
+                <p class="image-caption">Image: 'Black Mambas' all female anti-poaching unit in Kruger National Park.<a href="https://theecologist.org/2016/feb/19/south-africas-conservation-success-story-black-mambas-mean-business" 
+                    target="_blank">The Ecologist.</a>February 19, 2016.</p>
+            </div>
+            <div class="image-caption-container">
+              <img src="img/Anti Poaching Unit at Singita Sabi Sand.jpeg" alt="Anti Poaching Unit at Singita Sabi Sand">
+              <p class="image-caption">Image: K9 Anti Poaching Unit at Sabi Sand Wildtuin. <a href="https://singita.com/2021/02/anti-poaching-unit-at-singita-sabi-sand-makes-strides/" target="_blank">Singita</a>, February 2012.</p>
+            </div>
+            <div class="image-caption-container">
+              <img src="img/antipoaching_aircraft.jpg" alt="Anti-Poaching Aircraft">
+              <p class="image-caption">Image: New aircraft in Kruger Park for anti-poaching efforts. <a href="https://www.timeslive.co.za/news/sci-tech/2018-10-22-watch-out-kruger-park-gets-new-aircraft-in-fight-against-poaching/" target="_blank">Times Live</a>, October 22, 2018.</p>
+            </div>
+            <div class="nav-buttons">
+                <button id="prev">Prev</button>
+                <button id="next">Next</button>
+                <button id="fullscreen">Fullscreen</button>
+            </div>
+            
+          </div>
+           
+          <script>
+                document.addEventListener("DOMContentLoaded", function() {
+                let slides = document.querySelectorAll('.image-caption-container');
+                let currentIndex = 0;
+                let autoPlayInterval = null;
+
+                function showSlide(index) {
+                    slides.forEach((slide, idx) => {
+                        if (idx === index) {
+                            slide.style.display = 'block'; // Ensure it's visible
+                            slide.classList.add('active'); // Mark as active
+                        } else {
+                            slide.style.display = 'none'; // Ensure it's not visible
+                            slide.classList.remove('active'); // Remove active class
+                        }
+                    });
+                }
+
+
+                function nextSlide() {
+                    currentIndex = (currentIndex + 1) % slides.length;
+                    showSlide(currentIndex);
+                }
+
+                function prevSlide() {
+                    currentIndex = (currentIndex - 1 + slides.length) % slides.length;
+                    showSlide(currentIndex);
+                }
+
+                document.getElementById('next').addEventListener('click', nextSlide);
+                document.getElementById('prev').addEventListener('click', prevSlide);
+
+                function startAutoPlay() {
+                    if (autoPlayInterval === null) {
+                    autoPlayInterval = setInterval(nextSlide, 3000);
+                    }
+                }
+
+                function stopAutoPlay() {
+                    clearInterval(autoPlayInterval);
+                    autoPlayInterval = null;
+                }
+
+                // Check if the slideshow is in view
+                function checkVisibility() {
+                    const slideshowRect = document.querySelector('.antipoaching-images').getBoundingClientRect();
+                    const isVisible = slideshowRect.top < window.innerHeight && slideshowRect.bottom >= 0;
+
+                    if (isVisible) {
+                    startAutoPlay();
+                    } else {
+                    stopAutoPlay();
+                    }
+                }
+
+                // Initial setup
+                showSlide(currentIndex);
+                window.addEventListener('scroll', checkVisibility);
+                });
+
+                // Full Screen JS Code // 
+                document.getElementById('fullscreen').addEventListener('click', toggleFullScreen);
+
+                function toggleFullScreen() {
+                    const slideshow = document.querySelector('.antipoaching-images'); // Container for the slideshow
+
+                    if (!document.fullscreenElement) {
+                        if (slideshow.requestFullscreen) {
+                            slideshow.requestFullscreen();
+                        } else if (slideshow.mozRequestFullScreen) { /* Firefox */
+                            slideshow.mozRequestFullScreen();
+                        } else if (slideshow.webkitRequestFullscreen) { /* Chrome, Safari & Opera */
+                            slideshow.webkitRequestFullscreen();
+                        } else if (slideshow.msRequestFullscreen) { /* IE/Edge */
+                            slideshow.msRequestFullscreen();
+                        }
+                    } else {
+                        if (document.exitFullscreen) {
+                            document.exitFullscreen();
+                        } else if (document.mozCancelFullScreen) { /* Firefox */
+                            document.mozCancelFullScreen();
+                        } else if (document.webkitExitFullscreen) { /* Chrome, Safari and Opera */
+                            document.webkitExitFullscreen();
+                        } else if (document.msExitFullscreen) { /* IE/Edge */
+                            document.msExitFullscreen();
+                        }
+                    }
+                }
+
+          </script>
+          
+   
+    <p> 
+        However, the deployment of such militarized measures has not been without controversy or consequence. From 2010 to 2015, it's estimated that around <strong>200 suspected poachers killed</strong>, 
+        and the SANDF suffered the loss of seven soldiers within KNP (Pinnock 2023). 
+        
+        This highlights the deadly consequences of these anti-poaching measures. The graph below illustrates this continuous trend, 
+        emphasizing the serious repercussions of these enforcement tactics.
+    </p>
+
+    <p>
+        Between 2013 and 2016, there was a noticeable increase in both the arrests and fatalities related to poaching, marking a period where anti-poaching efforts were significantly bolstered. 
+        This time saw considerable support from various organizations aimed at enhancing the capabilities of anti-poaching units within SANParks. 
+        Notably, the Gallet Group made a substantial donation of R359,100.00, and Lasher Tools committed to a donation of R332,158, with an ambitious target to reach R2 million by July 2016, as highlighted in a SANParks media release dated February 22, 2016. 
+        Additionally, the Global Exploration & Oceanographic Society contributed direct financial support to the Dyck Advisory Group Conservation Trust (DAG) from 2015 through 2018. This funding aimed to curb the influx of poachers entering Kruger National Park 
+        from the Mozambique border, indicating a concerted effort to address the challenges posed by poaching through financial and material support.
+    </p>
+
+    <div class="arrestsdeathschart">
+                <!-- Chart iframe here -->
+                <iframe width="1099" height="681" seamless frameborder="0" scrolling="no" 
+                src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTDeJykclL9yAy0a_p5qBwpbVstFS84W2BTsPaBIF3WBd0IgCSDuEuP8QYc3ujQJh8avdfptDweAfpd/pubchart?oid=2094688794&amp;format=interactive">
+            </iframe>
+            <div class="text-container"> 
+                <p class="graph-caption">               
+                Source: Data compiled from various releases by the South African Department of Environmental Affairs (ZA DEA), including Rhino Poaching Statistics (20 November 2014), Arrest Statistics Media Releases (2014/2015, 2016), National Environmental Compliance Enforcement Reports (2017), and Progress on Integrated Strategic Management of Rhinoceros (ISMR) reports (January 2018, September 2018, February 2019, and the first half of 2019).
+                </p> 
+            </div>
+    <script> 
+            document.addEventListener("DOMContentLoaded", function() {
+            const chart = document.querySelector('.arrestsdeathschart');
+            const observer = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('in-focus');
+                    } else {
+                        entry.target.classList.remove('in-focus');
+                    }
+                });
+            }, {
+                threshold: 0.5 // Trigger when 50% of the element is in view
+            });
+
+            observer.observe(chart);
+        });
+</script>
+   
+</section>
+
+<h2>
+    Understanding the Drivers of Poaching 
+ </h2>
+    <p>
+    Economic motivations are at the core of rhino poaching, largely driven by poverty, limited economic opportunities, and the lucrative demand for rhino horn in markets
+     like Vietnam and Hong Kong. South Africa, noted for having the highest levels of economic inequality globally, presents a backdrop where the illegal rhino horn trade offers 
+     significant financial incentives, especially to those struggling to make ends meet.
+    </p>
+    <p> 
+        This perspective is supported by a report titled "The People Beyond the Poaching: Interviews with Convicted Offenders in South Africa," released by TRAFFIC in September 2020. 
+        The report reveals that a unanimous 100% of the interviewees, all of whom were involved in illegal wildlife trafficking (IWT), 
+        cited income generation as the primary motivator for their actions. 73% of these individuals reported dire economic circumstances, with 7% not having enough income to survive and 
+        66% only managing to cover basic necessities like food, water, and shelter. Importantly, 54 of the interviewees were directly involved in the illegal rhino horn trade within Kruger
+        National Park.
+    </p>
+    <p> 
+        These statistics highlight the desperate economic conditions that drive individuals toward rhino poaching, stressing the need to address the underlying socioeconomic challenges. 
+        The allure of the illegal rhino horn trade, coupled with South Africa's stark economic disparities, illustrates the complex interplay of factors contributing to the poaching crisis. 
+        Moving beyond the reliance on militarized anti-poaching measures, which prioritize surveillance and enforcement, is crucial. Effective conservation efforts and the protection of endangered species like rhinos necessitate addressing the root causes driving poaching. 
+        Focusing on the socioeconomic factors at play offers a more sustainable path towards resolving the challenges facing wildlife conservation. 
+    </p>
+    
+    <div class="images-container">
+        <div class="media-item">
+            <img src="img/TRAFFIC_Interviews.jpg" alt="TRAFFIC Interview Results Table">
+
+            <div class="highlight-box"></div>
+
+            <p class="image-caption2">
+                Factors Influencing or Rationalizing Offenders' Engagement in IWT. Adapted from 
+                <a href="https://www.traffic.org/publications/reports/the-people-beyond-the-poaching/" target="_blank">"The People Beyond the Poaching"</a> 
+                report by Moneron, Armstrong, and Newton (2020), published by TRAFFIC International.
+            </p>
+        </div>
+
+        <script>
+            // Get the image and the highlight box
+        const image = document.querySelector('.media-item img');
+        const highlightBox = document.querySelector('.highlight-box');
+
+        // Function to check if the image is in the viewport
+        function isInViewport(element) {
+            const rect = element.getBoundingClientRect();
+            return (
+                rect.top >= 0 &&
+                rect.left >= 0 &&
+                rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+                rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+            );
+        }
+
+        // Function to toggle the highlight box based on whether the image is in the viewport
+        function toggleHighlight() {
+            if (isInViewport(image)) {
+                highlightBox.style.display = 'block';  // Show the highlight box
+            } else {
+                highlightBox.style.display = 'none';   // Hide the highlight box
+            }
+        }
+
+        // Add scroll event listener to toggle the highlight box
+        window.addEventListener('scroll', toggleHighlight);
+        </script>
+
+        <div class="media-item">
+            <iframe title="vimeo-player" src="https://player.vimeo.com/video/460262003?h=cce368043c" width="640" height="360" frameborder="0"    allowfullscreen></iframe>
+            <p class="image-caption2">
+                Video: An Inside Look at TRAFFIC's Interviews with Convicted Poachers in South Africa. This video sheds light on the motivations and circumstances that 
+                drive individuals to poaching. 
+                Published on 24 September 2020 by TRAFFIC. Access the full report and details at <a href="https://www.traffic.org/publications/reports/the-people-beyond-the-poaching/">'The People Beyond the Poaching'</a> on TRAFFIC's website
+            </p>
+        </div>
+    </div>
+
+
+    <section class="traffic">
+        <h3 class="traffic-section-header">The Global Demand for Rhino Horn</h3>
+        
+        <p>       
+        South Africa harbors approximately 75% of the world's remaining rhinos, with KNP serving as a primary sanctuary. 
+                The demand for rhino horn has seen a decline in recent years, paralleled by a reduction in poaching activities. 
+                Notably, from 2008 to 2019, there was a marked increase in the seizure of rhino horns internationally, indicating heightened efforts to combat this illegal trade. 
+                Seizures predominantly occur in airports, with traffickers favoring air travel for smuggling, often hiding the horns in luggage. 
+                Data from the World Wildlife Report (2010-2017) highlights Chinese, Vietnamese, Indian, and South African nationals as the most frequent perpetrators of rhino horn smuggling. 
+                A significant number of these incidents involve Chinese suspects apprehended in China or South Africa, and Vietnamese suspects in Vietnam or Mozambique, pointing to China and Vietnam as the primary end markets.
+               </p>
+               <p>
+               This situation emphasizes a stark reality: demand for rhino horn, especially among the growing upper-middle classes in Vietnam and Hong Kong, combined with the socio-economic challenges faced in South Africa—such as severe poverty and limited economic opportunities—continues to fuel poaching in KNP. 
+               Economic disparities thus emerge as a critical factor in the persistence of this illegal trade, highlighting the necessity of addressing both demand and supply-side issues to effectively combat poaching. 
+               This analysis draws upon findings from the World Wildlife Report, released by the UNODC on July 9, 2020, offering a comprehensive overview of wildlife trafficking trends.
+            </p> 
+
+            <div class="hornseizureschart">
+                <iframe width="1032" height="644" seamless frameborder="0" scrolling="no" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTDeJykclL9yAy0a_p5qBwpbVstFS84W2BTsPaBIF3WBd0IgCSDuEuP8QYc3ujQJh8avdfptDweAfpd/pubchart?oid=444202320&amp;format=interactive" style="display: block; margin: auto;">
+                </iframe>
+            </div>
+            <div class="text-container">
+                <p class="graph-caption">Data sourced from: TRAFFIC (2021), "Significant Seizure Ahead of World Rhino Day Highlights Southeast Asia’s Role in Wildlife Trafficking,"
+                    <a href="https://www.traffic.org/news/significant-seizure-ahead-of-world-rhino-day-highlight-southeast-asias-key-trafficking-role/">Access the full report here.</a>
+                    UNODC World WISE Database; Wildlife Justice Commission (2023), "World Rhino Day: Making Headway in the Fight Against Rhino Horn Trafficking,"
+                    <a href="https://wildlifejustice.org/world-rhino-day-making-headway-in-the-fight-against-rhino-horn-trafficking/#:~:text=Decline%20in%20rhino%20horn%20trafficking%20and%20seizures&text=The%20data%20speaks%20for%20itself,from%20illegal%20trade%20so%20far">Access the full report here.</a>
+                </p>
+        </div>
+
+        <script> 
+            document.addEventListener("DOMContentLoaded", function() {
+            const chart = document.querySelector('.hornseizureschart');
+            const observer = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('in-focus');
+                    } else {
+                        entry.target.classList.remove('in-focus');
+                    }
+                });
+            }, {
+                threshold: 0.5 // Trigger when 50% of the element is in view
+            });
+
+            observer.observe(chart);
+        });
+</script>
+        
+<div class="graphs-container">
+    <div class="graph-item">
+        <h5 class="graph-title">Reported National Origin of Rhino Horn Seizures by Weight (2002-2019)</h5>
+        <iframe width="890" height="560" seamless frameborder="0" scrolling="no" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTDeJykclL9yAy0a_p5qBwpbVstFS84W2BTsPaBIF3WBd0IgCSDuEuP8QYc3ujQJh8avdfptDweAfpd/pubchart?oid=2094319469&amp;format=interactive"></iframe>
+        <p class="graph-caption"><strong>Colors on the map represent the proportion of total seizure weight attributed to each country or region as percentages, reflecting where seized rhino horns originated from 2002 to 2019.</strong> Data sourced from: CITES Illegal Trade Database and UNODC World WISE Database.</p>
+    </div>
+
+    <div class="graph-item">
+        <h5 class="graph-title">Reported National Destination of Rhino Horn Seizures by Weight (2002-2019)</h5>
+        <iframe width="890" height="560" seamless frameborder="0" scrolling="no" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTDeJykclL9yAy0a_p5qBwpbVstFS84W2BTsPaBIF3WBd0IgCSDuEuP8QYc3ujQJh8avdfptDweAfpd/pubchart?oid=514618993&amp;format=interactive"></iframe>
+        <p class="graph-caption"><strong>Colors on the map represent the proportion of total seized weight that each country received as a destination for rhino horns from 2002 to 2019.</strong> Data sourced from "World Wildlife Crime Report: Trafficking in Protected Species," United Nations Office on Drugs and Crime (UNODC), 2020.
+            
+        </p>
+    </div>
+</div>
+
+        
+        <h5>Trafficking Flow Map of African Rhino Horn (2014-2018)</h5>
+                <img src="img/Trafficking_Rhino_Horn_Graphic.jpg" alt="Trafficking Rhino Horn Graphic" class="zoom-effect">
+                <p class="graph-caption">Source: UNODC World WISE Database. The year 2018 is based on partial data.</p>
+                
+                
+    </section>  
+    
+    <section> 
+        <h2>
+            Colonial Legacies in Kruger National Park
+        </h2>
+
+        <div class = "coloniallegaciesintro">
+        <p>
+        The Sabie Game Reserve, established in 1898, and the Singwitsi Game Reserve, proclaimed in 1903, were the precursors to what is now Kruger National Park. 
+        This protected area was created to protect the wildlife of the South African Lowveld during a period of intense colonial expansion and trophy hunting by Europeans, primarily Dutch and British.
+        The park's management strategies were steeped in military principles, embodying the 'fortress conservation' approach—strict enforcement with little to no involvement from local communities. 
+        This approach led to the dispossession, displacement, and policing of local communities and indigenous peoples, aligning with colonial perceptions of preserving 'pristine' nature.</p>
+        <p> 
+        Early visual representations from the park, such as advertisements and photographs, further emphasize this narrative. 
+        Advertisements from the era often depicted the land as empty and wild, notably absent of local people, while photos of rangers reveal the merging of protected areas with military forces, emphasizing the combative strategies against poaching right from the park's inception. 
+        These portrayals not only reflect Kruger’s colonial roots but also show its antagonistic relationship with the local communities and indigenous communities who had historically resided in the region—groups like the Tsonga, Northern Sotho (Sepedi), and Southern Ndebele. 
+    </p>
+
+    <p>
+        These communities, deeply connected to the land through hunting, fishing, and pastoral agriculture, faced severe disruptions. 
+        The establishment of the park as a protected area led to their displacement and imposed restrictions on their traditional land use.
+        The expansion of Kruger National Park throughout the 20th century continually perpetuated the dispossession and displacement of local communities and indigenous peoples. 
+        Notably, in the mid to late 1900s, the Makuleke community in the northern section of the park was forcibly removed from their ancestral lands.
+    </p>
+    
+  
+</div>
+
+<div class="colonialimage-container">
+    <div class="left-image">
+        <img src="img/one-of-the-first-advertisements-for-the-kruger-national-park-in-the-illustrated-london-news-june-1926.gif" class="zoom-effect">
+        <p class="image-caption3">
+            One of the first advertisements for the Kruger National Park, published in the Illustrated London News in June 1926. Image sourced from South African Eden, 
+            The Kruger National Park by Jane Carruthers, published in Arcadia, 2013, no. 12, part of the Arcadia Collection: National Parks in Time and Space.
+        </p>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var imgs = document.querySelectorAll('.zoom-effect');
+            imgs.forEach(function(img) {
+                img.addEventListener('click', function() {
+                    if (!document.fullscreenElement) {
+                        if (img.requestFullscreen) {
+                            img.requestFullscreen();
+                        } else if (img.mozRequestFullScreen) { /* Firefox */
+                            img.mozRequestFullScreen();
+                        } else if (img.webkitRequestFullscreen) { /* Chrome, Safari & Opera */
+                            img.webkitRequestFullscreen();
+                        } else if (img.msRequestFullscreen) { /* IE/Edge */
+                            img.msRequestFullscreen();
+                        }
+                    } else {
+                        if (document.exitFullscreen) {
+                            document.exitFullscreen();
+                        } else if (document.mozCancelFullScreen) { /* Firefox */
+                            document.mozCancelFullScreen();
+                        } else if (document.webkitExitFullscreen) { /* Chrome, Safari and Opera */
+                            document.webkitExitFullscreen();
+                        } else if (document.msExitFullscreen) { /* IE/Edge */
+                            document.msExitFullscreen();
+                        }
+                    }
+                });
+            });
+        });
+        </script>
+        
+
+        <div class="right-image">
+            <img src="img/NCOs-Steinackers-Horse-Komatipoort-outside-the-big-house-1902.jpeg" class="active">
+            <div class="caption">TeamAG, & Oosthuizen, N. (2018). NCOs of Steinacker's Horse at Komatipoort outside the big house (1902) [Photograph]. 
+                In The Kruger History and Future. Africa Geographic Stories, (213). Retrieved from SANParks archives.</div>
+            
+            <img src="img/rangersimg.jpeg">
+            <div class="caption">Don Pinnock (2022).Local communities provided most of the rangers employed by Stevenson-Hamilton [Photograph].
+                In The Kruger National Park and its complex history of conservation and dispossession. Daily Maverick. Retrieved from SANParks archives.
+            </div>
+            
+            <img src="img/Major-James-Stevenson-Hamilton-in-Inniskilling-Dragoons-uniform-1914.jpg">
+            <div class="caption">TeamAG, & Oosthuizen, N. (2018). Major James Stevenson-Hamilton in Inniskilling Dragoons uniform (1914) [Photograph]. 
+                In The Kruger History and Future. Africa Geographic Stories, (213). Retrieved from SANParks archives.</div>
+            
+            <img src="img/SANParks Archives.webp">
+            <div class="caption">Don Pinnock (2022). As Sabi and then Kruger were considered preserves for huntable game, lions were seen as competitors and shot on sight [Photograph]. 
+                In The Kruger National Park and its complex history of conservation and dispossession. Daily Maverick. Retrieved from SANParks archives.</div>
+            
+                <img src="img/Kruger-sitings-2.webp">
+                <div class="caption">Don Pinnock (2022). Lions never failed to produce traffic jams of awed tourists [Photograph]. 
+                    In The Kruger National Park and its complex history of conservation and dispossession. Daily Maverick. Retrieved from SANParks archives.</div>
+                    
+                    <img src="img/Kruger-sitings-3.webp">
+                    <div class="caption">Don Pinnock (2022). By the 1950s, Kruger Park had become a global ‘must-see’ destination for tourists. [Photograph]. 
+                        In The Kruger National Park and its complex history of conservation and dispossession. Daily Maverick. Retrieved from SANParks archives.</div>
+                
+                    <button class="button" onclick="nextImage()">Next</button>
+        </div>
+        
+        
+        
+        
+        <script>
+       function nextImage() {
+    const images = document.querySelectorAll('.right-image img');
+    const captions = document.querySelectorAll('.right-image .caption');
+    const total = images.length;
+    let current = -1;
+
+    // Find the current image
+    images.forEach((img, index) => {
+        if (img.classList.contains('active')) {
+            current = index;
+            img.classList.remove('active'); // Hide current image
+            captions[index].classList.remove('active'); // Hide current caption
+        }
+    });
+
+    // Show next image and caption
+    const nextIndex = (current + 1) % total;
+    images[nextIndex].classList.add('active');
+    captions[nextIndex].classList.add('active');
+}
+
+</script> 
+
+    <script>
+        function initComparisons() {
+          var x, i;
+          /*find all elements with an "overlay" class:*/
+          x = document.getElementsByClassName("img-comp-overlay");
+          for (i = 0; i < x.length; i++) {
+            /*once for each "overlay" element:
+            pass the "overlay" element as a parameter when executing the compareImages function:*/
+            compareImages(x[i]);
+          }
+          function compareImages(img) {
+            var slider, img, clicked = 0, w, h;
+            /*get the width and height of the img element*/
+            w = img.offsetWidth;
+            h = img.offsetHeight;
+            /*set the width of the img element to 50%:*/
+            img.style.width = (w / 2) + "px";
+            /*create slider:*/
+            slider = document.createElement("DIV");
+            slider.setAttribute("class", "img-comp-slider");
+            /*insert slider*/
+            img.parentElement.insertBefore(slider, img);
+            /*position the slider in the middle:*/
+            slider.style.top = (h / 2) - (slider.offsetHeight / 2) + "px";
+            slider.style.left = (w / 2) - (slider.offsetWidth / 2) + "px";
+            /*execute a function when the mouse button is pressed:*/
+            slider.addEventListener("mousedown", slideReady);
+            /*and another function when the mouse button is released:*/
+            window.addEventListener("mouseup", slideFinish);
+            /*or touched (for touch screens:*/
+            slider.addEventListener("touchstart", slideReady);
+            /*and released (for touch screens:*/
+            window.addEventListener("touchend", slideFinish);
+            function slideReady(e) {
+              /*prevent any other actions that may occur when moving over the image:*/
+              e.preventDefault();
+              /*the slider is now clicked and ready to move:*/
+              clicked = 1;
+              /*execute a function when the slider is moved:*/
+              window.addEventListener("mousemove", slideMove);
+              window.addEventListener("touchmove", slideMove);
+            }
+            function slideFinish() {
+              /*the slider is no longer clicked:*/
+              clicked = 0;
+            }
+            function slideMove(e) {
+              var pos;
+              /*if the slider is no longer clicked, exit this function:*/
+              if (clicked == 0) return false;
+              /*get the cursor's x position:*/
+              pos = getCursorPos(e)
+              /*prevent the slider from being positioned outside the image:*/
+              if (pos < 0) pos = 0;
+              if (pos > w) pos = w;
+              /*execute a function that will resize the overlay image according to the cursor:*/
+              slide(pos);
+            }
+            function getCursorPos(e) {
+              var a, x = 0;
+              e = (e.changedTouches) ? e.changedTouches[0] : e;
+              /*get the x positions of the image:*/
+              a = img.getBoundingClientRect();
+              /*calculate the cursor's x coordinate, relative to the image:*/
+              x = e.pageX - a.left;
+              /*consider any page scrolling:*/
+              x = x - window.pageXOffset;
+              return x;
+            }
+            function slide(x) {
+              /*resize the image:*/
+              img.style.width = x + "px";
+              /*position the slider:*/
+              slider.style.left = img.offsetWidth - (slider.offsetWidth / 2) + "px";
+            }
+          }
+        }
+        </script>
+        </head>
+    </section>
+        
+        <section> 
+        <h5>Click and slide the green slider to see the expansion of the Sabi and Singwitsi Game Reserves into Kruger National Park</h5>
+        <h6>Maps by Dr. Jane Carruthers</h6>
+        
+        <div class="img-comp-container">
+          <div class="img-comp-img">
+            <img src="img/KNP_1995.png" width="400" height="800">
+          </div>
+          <div class="img-comp-img img-comp-overlay">
+            <img src="img/KNP_1903.png" width="400" height="800">
+            
+          </div>
+        </div>
+        
+        <script>
+        /*Execute a function that will execute an image compare function for each element with the img-comp-overlay class:*/
+        initComparisons();
+        </script> 
+
+    </section>
+
+<section> 
+    <div class="container5">
+        <section id="quote0">
+            <blockquotetitle>
+                The following excerpts highlight the colonial-era narratives used by the administration of Kruger National Park. 
+                These narratives were often racialized and dehumanizing, portraying local residents as adversaries to conservation efforts. 
+                The administration advocated for strategies to exclude and closely monitor these communities within the park.
+             </blockquotetitle>
+        </section>
+        
+        <section id="quote1" class="step">
+            <blockquote>"In 1911 Ranger Fraser, suspecting certain kraals of poaching, but unable to obtain evidence, 
+                removed residents from the reserve in co-operation with the local police and other authorities."</blockquote>
+            <cite>Preliminary Report: African-Owned or Occupied Land Presently Included in National Parks by Dr. Jane Carruthers, 
+                January 1994, Box NK/2/1 Boundaries and Adjacent Areas A20 1995, Kruger National Park Archives, Stevenson-Hamilton Resource Center, Skukuza, Kruger National Park. 
+            </cite>
+        </section>
+        <section id="quote2" class="step">
+            <blockquote>"I therefore know that we are taking over natives who are not lawabiding and who have little conception of disciplinary control.”</blockquote>
+            <cite>Memorandum on Proposed Exchange of Land Between National Parks Board and S.A. Native Trust: Pafuri Area, Warden of Kruger National Park, January 19, 1953, 
+                Kruger National Park Archives, Stevenson-Hamilton Resource Center, Skukuza, Kruger National Park.</cite>
+        </section>
+        <section id="quote3" class="step">
+            <blockquote>“Knowing the native mind I am certain that they are already resenting our possession of this ground, and their resentment will probably take 
+                the practical form of poaching, well knowing that in law we cannot proceed against them for trespassing.”</blockquote>
+            <cite>Sgd J.A.B. Sandenbergh, Warden of Kruger National Park, June 20, 1946, Kruger National Park Archives, Stevenson-Hamilton Resource Center, Skukuza, Kruger National Park.</cite>
+        </section>
+        <section id="quote4" class="step">
+            <blockquote>“In former years - up to about 1929 - there used to be a good deal of poaching along the border on the east by Portuguese natives 
+                culminating in a shooting affray in that year when a Portuguese poacher was killed. Since that time, when the offenders were captured on 
+                our representations, and sentenced to 14 years imprisonment by the Portuguese authorities (only one out of 12 survived to be released!) there have been no serious cases reported to this office”</blockquote>
+            <cite>Grading of Sections Report by Sgd Stevenson-Hamilton, Warden of Kruger National Park, 1945, Kruger National Park Archives, Stevenson-Hamilton Resource Center, Skukuza, Kruger National Park.</cite>
+        </section>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+    const steps = document.querySelectorAll('.step');
+    const observerOptions = {
+        rootMargin: '0px',
+        threshold: 0.5
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('step-active');
+            } else {
+                entry.target.classList.remove('step-active');
+            }
+        });
+    }, observerOptions);
+
+    steps.forEach(step => {
+        observer.observe(step);
+    });
+});
+
+    </script>
+    </section>
+    
+</article>
+
+
+
+<script src="script.js"></script>
+
+</body>
+</html>

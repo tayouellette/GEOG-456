@@ -10,31 +10,24 @@ document.addEventListener("DOMContentLoaded", function() {
     .addTo(controller);
 
     // Define a timeline for the zoom and text resize animations
-    var timeline = gsap.timeline();
+   // Define a timeline for the zoom and text resize animations
+var timeline = gsap.timeline();
 
-    // Add zoom animation for the chart
-    timeline.to(".graph-container iframe", {
-        scale: 1,
-        ease: "none",
-        duration: 1,
-        transformOrigin: "center center",
-    }, 0);
-
-    // Simultaneously, adjust the text size or position
-    timeline.to(".text-container", {
-        scale: 1,
-        ease: "none",
-        duration: 1,
-        transformOrigin: "left top",
-    }, 0);
+// Add zoom animation for the chart
+timeline.to("#rhinoPoachingImpact iframe", {
+    scale: 1.07, // Make sure scale is clearly noticeable
+    ease: "none",
+    duration: 1,
+    transformOrigin: "50% 50%" // Center the zoom effect
+});
 
     // Create a ScrollMagic Scene to trigger the animation
     new ScrollMagic.Scene({
         triggerElement: "#rhinoPoachingImpact",
-        duration: "10%", // This duration value controls how long the animation part is relevant to the scroll distance.
+        duration: window.innerHeight, // Example: set to the height of the viewport
         triggerHook: 0.5,
         reverse: true
     })
     .setTween(timeline)
-    .addTo(controller);
+    .addTo(controller) 
 });
