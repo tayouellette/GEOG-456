@@ -117,7 +117,7 @@
 
         .highlight-box {
             position: absolute;
-            top: 33px;
+            top: 36px;
             left: 0;
             right: 0;
             bottom: 0;
@@ -173,10 +173,11 @@
             font-weight: bold; /* Bolder font */
             color: #333; /* Dark grey color */
             text-align: left; /* Left align */
-            margin-bottom: 5px; /* Adds some space below the title */
+            margin-bottom: 40px; /* Adds some space below the title */
             font-family: 'Arial', sans-serif; /* Common font family */
             max-width: 45%;
             position: absolute;
+            
             
         }
 
@@ -325,11 +326,20 @@
         font-size: 16px; /* Adjust font size as needed */
     }
 
+    #legend {
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent background for readability */
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    z-index: 1000; /* Ensure it's above the map */
+}
+
     .legend {
     position: absolute;
-    bottom: 20px;
+    bottom: 60px;
     right: 10px;
-    background: rgba(255, 255, 255, 0.8);
     padding: 10px;
     border-radius: 5px;
     font-size: 18px;
@@ -338,6 +348,7 @@
 
     .legend h4 {
         margin: 0 0 5px;
+        color: white;
     }
 
     .legend div {
@@ -369,21 +380,25 @@
 
 /* 2013-2022 Leaflet Map */
 
-.fullscreen-iframe {
-    width: 100%;
-    height: 100%;
-    border: none;    /* Removes the border */
-    padding: 0;      /* No padding */
-    margin: 0;       /* No margins */
-    display: block;  /* Prevents inline gaps */
-    position: absolute; /* Optional: Makes it absolutely positioned within a relative container */
+.parent-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* Aligns items at the start of the container */
+    width: 100%; /* Full width to cover the viewport */
+    gap: 20px; /* Optional: adds space between the sections */
+    height: 100vh; /* Or set a fixed height like 800px depending on your design */
+
 }
 
-.containerleaf {
-    width: 100%;
-    height: 100vh;   /* 100% of the viewport height */
-    position: relative; /* Needed if iframe is absolute */
-    overflow: hidden; /* Ensures no scrollbars are visible */
+.map-section {
+    flex: 1; /* Each section takes equal width */
+    max-width: 50%; /* Ensures no section grows beyond 50% of the parent's width */
+    height: 100%; /* Adjust height as needed or use a specific value */
+}
+.fullscreen-iframe {
+    width: 100%;  /* Full width of its container */
+    height: 100%; /* Full height to avoid internal scrollbars */
+    border: none;  /* Optional: Removes the border around the iframe */
 }
 
 
@@ -848,7 +863,7 @@ cite {
 <article>
     <header>
         <header class="title-background">
-            <h1>Exploring the Spatial & Temporal Dimensions of Poaching in Kruger National Park
+            <h1>Exploring the Political Ecology of Poaching in Kruger National Park
                 <p>Taylor Ouellette, Environment, Ecology, Energy Program, The University of North Carolina at Chapel Hill</p></h1>
         <!-- Date can be dynamically inserted using JavaScript -->
         <p id="date"></p>
@@ -954,12 +969,26 @@ cite {
         </script>
 
     <!-- 1943 Leaflet Map -->
+   
+    <h3>
+        Spatial Dynamics of Poaching Over Time </h3>
+        <p>
+            Below are two maps illustrating the spatial dynamics of poaching over time in KNP. The first map is based on a 1946 Grading of Sections 
+            report from KNP's archives, highlighting poaching hotspots near local communities and indigenous populations, historically referred to as "natives" by the colonial administration. 
+            Initially, poaching primarily focused on subsistence rather than illegal wildlife trafficking, with significant activity concentrated in the southern sections of Kruger.
 
-        <section>
+            The second map, titled "Distribution of Rhino Poaching Across Ranger Sections 2013-2022," shows a notable shift in poaching activities towards the South Africa-Mozambique border along Kruger's eastern boundary. 
+            According to a SANParks official, approximately 70% of rhino poaching incidents now occur along this border, reflecting a significant change in the geography of poaching within the park.
+
+        </p>
+
+    <div class="parent-container">
+
+        <section class="map-section">
             <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
             <script src = "1946_knpsections_poach.js"></script> 
-        <h3>
-            Spatial Dynamics of Poaching Over Time </h3>
+       
+            <h5>Distribution of Poaching Across Ranger Sections 1946</h5>
             <div id="map">
             <!-- Your existing HTML for legend and other elements -->
 
@@ -1062,14 +1091,18 @@ cite {
         populateLegend();
 
             </script>
-</section>
-<section> 
-    <h3>2013-2022 Kruger National Park Poaching Analysis</h3>
-    <div class="containerleaf">
-        <iframe src="https://tayouellette.github.io/GEOG-456/hw7/2013_2022_knpsections_slider.html" class="fullscreen-iframe"></iframe>
-    </div>
-    
-</section>
+        </section>
+
+            <section class="map-section">
+                <div class="containerleaf">
+                    <iframe src="file:///Users/taylorouellette/Desktop/GEOG%20456/GitHub/GEOG-456/final%20project/knp_webpage/final_project/2013_2022_knpsections_slider.html" class="fullscreen-iframe"></iframe>
+                </div>
+                
+            </section>
+
+</div>
+
+
 
 
  
@@ -1743,6 +1776,8 @@ cite {
 
 
 <script src="script.js"></script>
+
+
 
 </body>
 </html>

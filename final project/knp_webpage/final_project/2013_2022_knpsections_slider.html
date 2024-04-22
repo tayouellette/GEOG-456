@@ -6,14 +6,18 @@
     <title>Kruger National Park Poaching per Ranger Section</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     <style>
-    body {
-            background-color: #393737; /* Set your desired background color here */
+ 
+  
+    
+h5 {
+            font-size: 20px; /* Slightly smaller than H3 for hierarchical structure */
+            font-weight: 580; /* Bold to stand out */
+            color: #434343; /* Earthy brown, adjusts according to your theme */
+            margin-bottom: 15px; /* Adds some space below the heading */
+            padding-top: 10px; /* Space above the heading */
+            font-family: 'Arial', sans-serif; /* Consistency with other headings */
+            text-align: center; /* Aligns text to the left */
         }
-    h1 {
-        color: white; 
-        text-align: center;
-}
-      
 
 
 #map {
@@ -42,8 +46,8 @@
 }
 
 #legend {
-    bottom: 70px;
-    right: 135px;
+    bottom: 60px;
+    right: 10px;
     font-size: 18px;
 }
 
@@ -78,7 +82,7 @@
   #yearSlider {
     width: 100%; /* Full width of its container */
     height: 9px; /* Slider track height */
-    background: #ddd; /* Track color */
+    background: #555; /* Track color */
     outline: none; /* Removes the outline on focus */
     opacity: 0.7; /* Slightly transparent */
     -webkit-transition: opacity .2s; /* Smooth transition for hover effect */
@@ -95,7 +99,7 @@
     appearance: none;
     width: 20px; /* Width of the thumb */
     height: 20px; /* Height of the thumb */
-    background: #f9fbf9; /* Thumb color */
+    background: #333; /* Thumb color */
     cursor: pointer; /* Cursor changes to a pointer */
     border-radius: 50%; /* Circular thumb */
 }
@@ -104,7 +108,7 @@
 #yearSlider::-moz-range-thumb {
     width: 20px; /* Width of the thumb */
     height: 20px; /* Height of the thumb */
-    background: #fefefe; /* Thumb color */
+    background: #333; /* Thumb color */
     cursor: pointer; /* Cursor changes to a pointer */
     border-radius: 50%; /* Circular thumb */
 }
@@ -138,7 +142,7 @@
 
 .slider-title {
     font-size: 19px; /* Slightly smaller text */
-    color: white; /* Adjust the color as needed */
+    color: #333; /* Adjust the color as needed */
     text-align: center;
     margin-bottom: 0px; /* Reduced space between the title and the slider */
 }
@@ -177,11 +181,11 @@
 
 </head>
 <body>
-    <h1>Kruger National Park: Distribution of Rhino Poaching Across Ranger Sections</h1>
+    <h5>Distribution of Rhino Poaching Across Ranger Sections 2013-2022</h5>
     <div id="map">
         <div id="year-display-container">Year: <span id="yearDisplay">2013</span></div>
         <div id="slider-container">
-            <div class="slider-title">Slide to manually change the year</div>
+            <div class="slider-title">Slide to change the year</div>
             <input id="yearSlider" type="range" min="2013" max="2022" value="2013" oninput="updateMap(this.value)" />
         </div>
         <div id="legend" class="legend">
