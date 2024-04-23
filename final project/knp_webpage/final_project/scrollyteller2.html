@@ -16,21 +16,42 @@
     <script src="animation.js"></script>
 
     <style>
-     html, body {
-            margin: 5px;
-            padding: 0;
-            overflow-x: hidden; /* Ensures there are no horizontal scrollbars */
 
-        }
+html, body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    overflow-y: auto; /* Allows scrolling on the whole page */
+    height: 100%; /* Full height to prevent extra scrollbars */
+}
 
-        .logo 
-        {
-            position: absolute; /* Or 'fixed' if you want it to stay in place on scroll */
-            top: 10px; /* Adjust for padding from the top */
-            right: 24px; /* Adjust for padding from the right */
-            width: 120px; /* Adjust based on your logo's size */
-            height: auto; /* Keeps the aspect ratio */
-                    }
+.title-background {
+    background-image: url('img/An\ armed\ ranger\ accompanies\ every\ hike\ in\ Kruger.jpg');
+    background-size: cover;
+    background-position: center;
+    color: white;
+    text-align: left;
+    padding: 20px; /* Adjust padding to ensure content fits */
+    width: 100%;
+    height: 1200px; /* Fixed height to prevent excessive space */
+    position: static;
+    top: 0;
+    left: 0;
+    z-index: 1000; /* High z-index to keep it on top */
+}
+
+.logo {
+    position: fixed; /* Make logo fixed if you want it to stay with the title */
+    top: 10px;
+    right: 24px;
+    width: 160px;
+    height: auto;
+    z-index: 1010; /* Ensure logo is above the title background */
+}
+
+
+
+   
 
         .map-and-image-container iframe,
             .map-and-image-container img {
@@ -74,26 +95,7 @@
                 }
             }
 
-            .title-background {
-                background-image: url('img/An\ armed\ ranger\ accompanies\ every\ hike\ in\ Kruger.jpg'); /* Ensure correct path */
-                background-size: cover;
-                background-position: center;
-                color: white;
-                text-align: left;
-                padding: 3px 0;
-                min-height: 110vh;  /* Increase the height to 110vh or adjust as needed */
-                width: 100vw;
-                top: 0;
-                left: 0; /* Align to the left edge */
-                right: 0; /* Align to the right edge */
-                z-index: 1000; /* Ensure it's above other content if using sticky */
-            }
-
-            .title {
-                position: absolute;
-            }  
-
-
+            
 /* Drivers of Poaching Media */
         .images-container {
             display: flex;
@@ -173,10 +175,10 @@
             font-weight: bold; /* Bolder font */
             color: #333; /* Dark grey color */
             text-align: left; /* Left align */
-            margin-bottom: 40px; /* Adds some space below the title */
+            margin-top: 20px;
+            margin-bottom: 30px; /* Adds some space below the title */
             font-family: 'Arial', sans-serif; /* Common font family */
-            max-width: 45%;
-            position: absolute;
+            max-width: 37%;
             
             
         }
@@ -854,6 +856,32 @@ cite {
     margin-top: 80px;
 }
 
+.conclusion {
+    padding: 20px;
+    margin: 20px 0; /* Adds vertical space around the conclusion */
+    border-left: 5px solid #333; /* Adds a stylistic left border */
+    margin-top: 2450px;
+}
+
+.conclusion h2 {
+   
+            font-size: 32px; /* Large but slightly smaller than the main title */
+            font-weight: 600; /* Bold but less than the main title */
+            color: #555; /* Slightly lighter grey */
+            padding: 10px 0; /* Adds padding above and below */
+            border-bottom: 2px solid #ddd; /* Adds a line below the header */
+            margin-bottom: 20px; /* Adds some space below the header */
+            font-family: 'Arial', sans-serif; /* Maintains consistency in font */
+        
+}
+
+.conclusion p {
+    font-size: 16px;
+    line-height: 1.6;
+    color: #666; /* Dark gray text for readability */
+    margin-bottom: 10px;
+}
+
       
     </style>
 </head>
@@ -861,17 +889,12 @@ cite {
 <body>
     
 <article>
-    <header>
-        <header class="title-background">
-            <h1>Exploring the Political Ecology of Poaching in Kruger National Park
-                <p>Taylor Ouellette, Environment, Ecology, Energy Program, The University of North Carolina at Chapel Hill</p></h1>
-        <!-- Date can be dynamically inserted using JavaScript -->
-        <p id="date"></p>
-        </header>
-
+    <header class="title-background">
+        <h1>Exploring the Political Ecology of Poaching in Kruger National Park</h1>
+        <p style="width: 28%; text-align: left; margin-left: 3px;">Taylor Ouellette, Environment, Ecology, Energy Program, The University of North Carolina at Chapel Hill</p>
     </header>
-
-    <img src="img/unclogo.png" alt="Your Logo" class="logo">
+    <img src="img/unclogo.png" alt="UNC Logo" class="logo">
+    
 
     <section>
         <h2>Kruger National Park: A Global Rhino Poaching Hotspot</h2>
@@ -1770,6 +1793,29 @@ cite {
 
     </script>
     </section>
+
+    <section class="conclusion">
+        <h2>Conclusion</h2>
+        <p>
+            Efforts to combat poaching in KNP emphasize the need for strategies that address not just the immediate illegal activities but also the deeper socio-economic drivers behind them.
+             Traditional command and control approaches, while important for curbing poaching, are insufficient on their own. Long-term solutions necessitate integrating social, economic, and 
+             conservation goals, focusing particularly on alleviating poverty and creating alternative livelihoods for those residing near the park.
+        </p>
+            <p>
+            Adopting community-based conservation and co-management frameworks presents a promising path forward. These strategies ensure that conservation efforts are inclusive, incorporating the experiences, 
+            needs, and knowledge of local communities and indigenous peoples. By engaging these groups as active participants and beneficiaries, KNP can foster a sense of ownership and stewardship among those who 
+            are most directly impacted by conservation policies, both historically and presently.
+        </p>
+        <p>
+            Moving forward, it is crucial for conservation initiatives to evolve from exclusionary practices to inclusive governance models. 
+            This shift not only enhances the effective management of natural resources but also ensures that conservation efforts benefit both biodiversity and the communities deeply connected to these ecosystems.
+            
+        
+        </p>
+    </section>
+    <footer>
+        <p>Coding assistance provided by <a href="https://www.openai.com/chatgpt">ChatGPT</a>.</p>
+    </footer>
     
 </article>
 
