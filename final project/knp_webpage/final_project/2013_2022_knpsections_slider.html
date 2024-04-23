@@ -175,6 +175,35 @@ h5 {
     vertical-align: middle; /* Align the circle vertically with the text */
 }
 
+#playButton {
+    color: white; /* White text */
+    padding: 10px 20px; /* Top and bottom padding 10px, left and right padding 20px */
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded corners */
+    font-size: 16px; /* Font size */
+    cursor: pointer; /* Cursor appears as a pointer on hover */
+    outline: none; /* Removes the outline */
+    transition: background-color 0.3s; /* Smooth transition for background color change on hover */
+    background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent background for readability */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+#playButton:hover, #playButton:focus {
+    background-color: #45a049; /* Darker shade of green when hovered or focused */
+}
+#playButton:active {
+    background-color: #3e8e41; /* Even darker green when the button is clicked */
+    box-shadow: 0 2px #666; /* Shadow to make it look like the button is pressed down */
+    transform: translateY(2px); /* Slightly shift the button down to mimic a press */
+}
+
+#playButton:disabled {
+    background-color: #cccccc; /* Gray background to show it's disabled */
+    color: #666666; /* Dark gray text color */
+    cursor: not-allowed; /* Cursor shows it's not clickable */
+}
+
+
 
 
 </style>
@@ -187,6 +216,7 @@ h5 {
         <div id="slider-container">
             <div class="slider-title">Slide to change the year</div>
             <input id="yearSlider" type="range" min="2013" max="2022" value="2013" oninput="updateMap(this.value)" />
+            <button id="playButton">Play</button>
         </div>
         <div id="legend" class="legend">
             <h4>Legend</h4>
@@ -201,6 +231,7 @@ h5 {
             Click on a marker to see the section name and the number of poaching incidents for the selected year.
         </div>
     </div>
+    
 
 
 
@@ -251,29 +282,41 @@ h5 {
         var currentYear = startYear;
         var endYear = 2022;
 
-        function updateAnimation() {
-            if (currentYear <= endYear) {
-                updateMap(currentYear); // Update the map to the current year
-                changeSliderYear(currentYear); // Change the slider position to match the current year
-                currentYear++; // Move to the next year
-            } else {
-                // Log for debugging purposes to confirm this part of the code runs
-                console.log("Resetting to start year and stopping the animation.");
-                
-                // Instead of immediately resetting currentYear to startYear, we first clear the interval
-                clearInterval(play);
+    
 
-                // Then, manually call updateMap and changeSliderYear with startYear to ensure UI updates
-                // to reflect the reset without relying on the next interval tick, which will not come.
-                updateMap(startYear);
-                changeSliderYear(startYear);
+    var isAnimating = false;
+var playInterval;
 
-                // Log the reset for confirmation; this might not be necessary in your final code.
-                console.log("Animation completed and stopped. Current year reset to:", startYear);
-            }
-        }
+document.getElementById('playButton').addEventListener('click', function() {
+    if (!isAnimating) {
+        this.textContent = 'Pause';
+        isAnimating = true;
+        playInterval = setInterval(updateAnimation, 1000);
+    } else {
+        this.textContent = 'Play';
+        isAnimating = false;
+        clearInterval(playInterval);
+    }
+});
 
-        var play = setInterval(updateAnimation, 1000);
+function updateAnimation() {
+    if (currentYear <= endYear) {
+        updateMap(currentYear);
+        document.getElementById('yearSlider').value = currentYear;
+        currentYear++;
+    } else {
+        currentYear = startYear;
+        clearInterval(playInterval);
+        document.getElementById('playButton').textContent = 'Play';
+        isAnimating = false;
+    }
+}
+
+// Update the map to a specific year
+function updateMap(year) {
+    document.getElementById('yearDisplay').innerText = year;
+    // Your existing map update logic here
+}
 
         // Access the slider element
 var yearSlider = L.DomUtil.get('yearSlider');
